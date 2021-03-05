@@ -2,7 +2,7 @@
 
 ... enacting Black Mirror's "[Be Right Back](https://www.imdb.com/title/tt2290780/)"?
 
-## Phoneme-to-lip
+## Phoneme to lip movement
 
 A straightforward way of mapping phonemes to lip movements (_visemes_) is by aligning the phonetized transcription to the audio of the video.
 At test time, we can generate lip movements for a new transcription by sequencing the corresponding visemes.
