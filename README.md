@@ -15,17 +15,24 @@ faces and their landmarks were detected using the [`dlib` toolkit](http://dlib.n
 We also have access to the Lip Reading in the Wild dataset (although non-commercial conditions might apply) and we can also use alignments extracted with Gentle.
 
 **Representing lips.**
-Ways of representing lip landmarks:
+Here are some options of representing lip landmarks:
 
 - Heatmaps, one for each landmark.
 (See work on 2d pose estimation.)
 - Low-dimensional projection of the concatenated positions.
 We will probably need to center and normalize the positions.
-(See the paper Obamanet.)
+(See the Obamanet paper.)
 
 **Multi-speaker datasets.**
 If multiple speakers are present in the training dataset will we need to encode the speaker identity (in order to account for mouth shape variability)?
 Or is this information (the speaker identity) already present in the input audio stream?
+
+**Intermediate phoneme representation.**
+The model goes from audio to lips;
+we could explicitly enforce an intermediate layer to correspond to the phonetic.
+But what advantages such a design would bring? Better interpretability?
+In my opinion it would be nice to be able to have choose from two possible input modalities—audio or text—
+but such a feature might complicate the architecture too much.
 
 ## References
 
