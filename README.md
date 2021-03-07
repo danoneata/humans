@@ -22,7 +22,7 @@ Might be possible to leverage their pre-trained models as well.
 There are multiple ways of representing lip landmarks;
 here are some options:
 - Heatmaps, one for each landmark.
-(See work on [2d pose estimation](https://arxiv.org/abs/1602.00134).)
+(See work on 2d pose estimation: [convolutional pose mahcines](https://arxiv.org/abs/1602.00134) or [stacked hourglass networks](https://arxiv.org/abs/1603.06937).)
 - Low-dimensional projection of the concatenated positions.
 We will probably need to center and normalize the positions.
 (See the Obamanet paper, in the references.)
