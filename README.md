@@ -17,11 +17,14 @@ We will probably need to center and normalize the positions.
 
 **Data.**
 What datasets should we use for training the model?
-We need pairs of audio and front video recordings.
-If multiple speakers are present in the training dataset will we need to encode the speaker identity (in order to account for mouth shape variability)?
+We need pairs of audio and front video recordings;
+there should be plenty of such datasets.
+For example, we have access to the Lip Reading in the Wild dataset (although non-commercial conditions might apply).
+But if multiple speakers are present in the training dataset will we need to encode the speaker identity (in order to account for mouth shape variability)?
 Or is this information (the speaker identity) already present in the input audio stream?
+To explicitly circumvent the speaker variability, I would be very tempted to use a single-person dataset (_e.g._, Obama for which there are many video recording available).
 
-**Intermediate phoneme representation.**
+**Intermediate phonetic representation.**
 The model goes between two aligned signals: from audio to lips.
 We could explicitly enforce an intermediate layer to correspond to the phonetic representation,
 but what advantages would bring such a design? Maybe better interpretability?
@@ -35,9 +38,9 @@ At test time, we can generate lip movements for a new transcription by sequencin
 Here are some [initial results](http://speed.pub.ro/xts/backup-2020-05-20) that show 128 samples of lip movements for twelve phones (vowels):
 AA, AE, AH, AO, AW, AY, EH, EY, IH, IY, OW, UW.
 For this experiment, we have used the [GRID dataset](https://pubmed.ncbi.nlm.nih.gov/17139705/) and
-obtained the alignments by using a pre-trained automatic speech recognition (ASR) model trained on TED-LIUM with the Kaldi framework;
+obtained the alignments by using a pre-trained automatic speech recognition (ASR) model trained on TED-LIUM with the Kaldi framework
+(but we can also use alignments extracted with [Gentle](https://github.com/lowerquality/gentle)).
 faces and their landmarks were detected using the [`dlib` toolkit](http://dlib.net/).
-We also have access to the Lip Reading in the Wild dataset (although non-commercial conditions might apply) and we can also use alignments extracted with Gentle.
 
 # References
 
