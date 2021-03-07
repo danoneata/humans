@@ -2,8 +2,33 @@
 
 ... enacting Black Mirror's "[Be Right Back](https://www.imdb.com/title/tt2290780/)"?
 
-## Phoneme to lip movement
+# Task
 
+Our goal is to map the audio of a person speaking to the corresponding lip movement.
+
+**Representing lips.**
+There are multiple possibilities of representing lip landmarks;
+here are some options:
+- Heatmaps, one for each landmark.
+(See work on 2d pose estimation.)
+- Low-dimensional projection of the concatenated positions.
+We will probably need to center and normalize the positions.
+(See the Obamanet paper.)
+
+**Data.**
+What datasets should we use for training the model?
+We need pairs of audio and front video recordings.
+If multiple speakers are present in the training dataset will we need to encode the speaker identity (in order to account for mouth shape variability)?
+Or is this information (the speaker identity) already present in the input audio stream?
+
+**Intermediate phoneme representation.**
+The model goes between two aligned signals: from audio to lips.
+We could explicitly enforce an intermediate layer to correspond to the phonetic representation,
+but what advantages would bring such a design? Maybe better interpretability?
+In my opinion it would be nice to be able to have choose from two possible input modalities—audio or text—
+but adapting the architecture for this might complicate it too much.
+
+**An experiment in phoneme to lip movement mapping.**
 A straightforward way of mapping phonemes to lip movements (_visemes_) is by aligning the phonetized transcription to the audio of the video.
 At test time, we can generate lip movements for a new transcription by sequencing the corresponding visemes.
 
@@ -14,27 +39,7 @@ obtained the alignments by using a pre-trained automatic speech recognition (ASR
 faces and their landmarks were detected using the [`dlib` toolkit](http://dlib.net/).
 We also have access to the Lip Reading in the Wild dataset (although non-commercial conditions might apply) and we can also use alignments extracted with Gentle.
 
-**Representing lips.**
-Here are some options of representing lip landmarks:
-
-- Heatmaps, one for each landmark.
-(See work on 2d pose estimation.)
-- Low-dimensional projection of the concatenated positions.
-We will probably need to center and normalize the positions.
-(See the Obamanet paper.)
-
-**Multi-speaker datasets.**
-If multiple speakers are present in the training dataset will we need to encode the speaker identity (in order to account for mouth shape variability)?
-Or is this information (the speaker identity) already present in the input audio stream?
-
-**Intermediate phoneme representation.**
-The model goes from audio to lips;
-we could explicitly enforce an intermediate layer to correspond to the phonetic representation.
-But what advantages would bring such a design? Maybe better interpretability?
-In my opinion it would be nice to be able to have choose from two possible input modalities—audio or text—
-but adapting the architecture for this might complicate it too much.
-
-## References
+# References
 
 - Kumar, Rithesh, et al. "Obamanet: Photo-realistic lip-sync from text." arXiv preprint arXiv:1801.01442 (2017). [pdf](https://arxiv.org/pdf/1801.01442.pdf)
 - Fried, Ohad, et al. "Text-based editing of talking-head video." ACM Transactions on Graphics (TOG) 38.4 (2019): 1-14. [pdf](https://dl.acm.org/doi/pdf/10.1145/3306346.3323028)
