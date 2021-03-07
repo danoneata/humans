@@ -6,6 +6,12 @@
 
 Our goal is to map the audio of a person speaking to the corresponding lip movement.
 
+**Architectures.**
+The two signals (audio and lip movements) are aligned (modulo discretization).
+This means we can use any of the popular architectures (such as recurrent neural networks, convolutional networks, attention-based networks with possibly diagonally-constrained attention).
+If we are interested in an online scenario, maybe recurrent networks are the simplest variant, although the others can certainly be used for such a scenario.
+I would use an auto-regressive output to help smooth out the lip movements.
+
 **Representing lips.**
 There are multiple possibilities of representing lip landmarks;
 here are some options:
