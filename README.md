@@ -14,6 +14,19 @@ obtained the alignments by using a pre-trained automatic speech recognition (ASR
 faces and their landmarks were detected using the [`dlib` toolkit](http://dlib.net/).
 We also have access to the Lip Reading in the Wild dataset (although non-commercial conditions might apply) and we can also use alignments extracted with Gentle.
 
+**Representing lips.**
+Ways of representing lip landmarks:
+
+- Heatmaps, one for each landmark.
+(See work on 2d pose estimation.)
+- Low-dimensional projection of the concatenated positions.
+We will probably need to center and normalize the positions.
+(See the paper Obamanet.)
+
+**Multi-speaker datasets.**
+If multiple speakers are present in the training dataset will we need to encode the speaker identity (in order to account for mouth shape variability)?
+Or is this information (the speaker identity) already present in the input audio stream?
+
 ## References
 
 - Kumar, Rithesh, et al. "Obamanet: Photo-realistic lip-sync from text." arXiv preprint arXiv:1801.01442 (2017). [pdf](https://arxiv.org/pdf/1801.01442.pdf)
