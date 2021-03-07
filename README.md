@@ -2,24 +2,30 @@
 
 ... enacting Black Mirror's "[Be Right Back](https://www.imdb.com/title/tt2290780/)"?
 
-# Task
+---
 
-Our goal is to map the audio of a person speaking to the corresponding lip movement.
+**Task.**
+We want to automatically map the audio of a person speaking to the corresponding lip movement.
 
-**Architectures.**
+**Architecture.**
 The two signals (audio and lip movements) are aligned (modulo discretization).
-This means we can use any of the popular architectures (such as recurrent neural networks, convolutional networks, attention-based networks with possibly diagonally-constrained attention).
-If we are interested in an online scenario, maybe recurrent networks are the simplest variant, although the others can certainly be used for such a scenario.
-I would use an auto-regressive output to help smooth out the lip movements.
+This means we can potentially use any of the popular architectures (such as recurrent neural networks, convolutional networks, attention-based networks with possibly diagonally-constrained attention).
+If we are interested in an online scenario, maybe recurrent networks are the simplest variant, although the others can certainly be amended for such a scenario;
+if online prediction wouldn't be an issue, I would go with a Transformer architecture.
+I would predict the output in an auto-regressive manner to help smooth out the lip movements.
+
+**Representing audio.**
+It might be worthwhile to take inspiration from audio encoders in ASR models (see for example [ESPNet](https://github.com/espnet/espnet)).
+Might be possible to leverage their pre-trained models as well.
 
 **Representing lips.**
-There are multiple possibilities of representing lip landmarks;
+There are multiple ways of representing lip landmarks;
 here are some options:
 - Heatmaps, one for each landmark.
-(See work on 2d pose estimation.)
+(See work on [2d pose estimation](https://arxiv.org/abs/1602.00134).)
 - Low-dimensional projection of the concatenated positions.
 We will probably need to center and normalize the positions.
-(See the Obamanet paper.)
+(See the Obamanet paper, in the references.)
 
 **Data.**
 What datasets should we use for training the model?
@@ -29,6 +35,7 @@ For example, we have access to the Lip Reading in the Wild dataset (although non
 But if multiple speakers are present in the training dataset will we need to encode the speaker identity (in order to account for mouth shape variability)?
 Or is this information (the speaker identity) already present in the input audio stream?
 To explicitly circumvent the speaker variability, I would be very tempted to use a single-person dataset (_e.g._, Obama for which there are many video recording available).
+Although, on a second thought, this approach has the disadvantage of being specific to a single type of voice.
 
 **Intermediate phonetic representation.**
 The model goes between two aligned signals: from audio to lips.
@@ -37,7 +44,7 @@ but what advantages would bring such a design? Maybe better interpretability?
 In my opinion it would be nice to be able to have choose from two possible input modalities—audio or text—
 but adapting the architecture for this might complicate it too much.
 
-**An experiment in phoneme to lip movement mapping.**
+**An experiment in phoneme-to-lip mapping.**
 A straightforward way of mapping phonemes to lip movements (_visemes_) is by aligning the phonetized transcription to the audio of the video.
 At test time, we can generate lip movements for a new transcription by sequencing the corresponding visemes.
 
