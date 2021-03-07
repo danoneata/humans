@@ -29,10 +29,10 @@ Or is this information (the speaker identity) already present in the input audio
 
 **Intermediate phoneme representation.**
 The model goes from audio to lips;
-we could explicitly enforce an intermediate layer to correspond to the phonetic.
-But what advantages such a design would bring? Better interpretability?
+we could explicitly enforce an intermediate layer to correspond to the phonetic representation.
+But what advantages would bring such a design? Maybe better interpretability?
 In my opinion it would be nice to be able to have choose from two possible input modalities—audio or text—
-but such a feature might complicate the architecture too much.
+but adapting the architecture for this might complicate it too much.
 
 ## References
 
