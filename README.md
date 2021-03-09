@@ -37,6 +37,14 @@ Or is this information (the speaker identity) already present in the input audio
 To explicitly circumvent the speaker variability, I would be very tempted to use a single-person dataset (_e.g._, Obama for which there are many video recording available).
 Although, on a second thought, this approach has the disadvantage of being specific to a single type of voice.
 
+| dataset | num. hours | num. speakers | status     | observations | link |
+|---------|------------|---------------|------------|--------------|------|
+| GRID    |            |               | downloaded |              | |
+| LRW     |            |               | downloaded |              | [link](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html) |
+| LRS2    |            |               | TODO       |              | [link](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs2.html) |
+| LRS3    |            |               | TODO       |              | [link](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html) |
+| Lip2Wav | 100        | 5             | TODO       |              | [link](https://cove.thecvf.com/datasets/363) |
+
 **Intermediate phonetic representation.**
 The model goes between two aligned signals: from audio to lips.
 We could explicitly enforce an intermediate layer to correspond to the phonetic representation,
