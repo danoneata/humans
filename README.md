@@ -48,6 +48,11 @@ here are some options:
 We will probably need to center and normalize the positions.
 (See the Obamanet paper, in the references.)
 
+**Extracting face landmarks.**
+Currently, I'm using [dlib](http://dlib.net/),
+Dragoș also suggested [this library](https://github.com/1adrianb/face-alignment).
+Maybe try both for a few videos and check differences and timings.
+
 **Data.**
 What datasets should we use for training the model?
 We need pairs of audio and front video recordings;
