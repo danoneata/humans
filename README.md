@@ -2,7 +2,28 @@
 
 ... enacting Black Mirror's "[Be Right Back](https://www.imdb.com/title/tt2290780/)"?
 
----
+# Setup
+
+Prepare virtual environment:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+Install requirements:
+
+```bash
+pip install -U pip
+pip install -r requirements.txt
+```
+
+**Code style.**
+Please use the [black](https://github.com/psf/black) code formatter.
+
+# Overview
+
+This section presents an overview of the task and our approach.
 
 **Task.**
 We want to automatically map the audio of a person speaking to the corresponding lip movement.
@@ -39,7 +60,7 @@ Although, on a second thought, this approach has the disadvantage of being speci
 
 | dataset | num. hours | num. speakers | status     | observations | link |
 |---------|------------|---------------|------------|--------------|------|
-| GRID    |            |               | downloaded |              | |
+| GRID    |            |               | downloaded | limited vocabulary, constrained conditions | |
 | LRW     |            |               | downloaded |              | [link](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html) |
 | LRS2    |            |               | TODO       |              | [link](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs2.html) |
 | LRS3    |            |               | TODO       |              | [link](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html) |
