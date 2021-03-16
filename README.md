@@ -25,6 +25,12 @@ As an example see the GRID dataset at the following location (on the `lenovo` ma
 ls /home/doneata/work/humans/data/grid
 ```
 
+**Preparing models.**
+The base path for models is
+```bash
+ls /home/doneata/work/humans/models
+```
+
 # Main functionality
 
 Extract face landmarks:
@@ -85,6 +91,8 @@ But if multiple speakers are present in the training dataset will we need to enc
 Or is this information (the speaker identity) already present in the input audio stream?
 To explicitly circumvent the speaker variability, I would be very tempted to use a single-person dataset (_e.g._, Obama for which there are many video recording available).
 Although, on a second thought, this approach has the disadvantage of being specific to a single type of voice.
+
+_Q_ Business-wise is better to target a single speaker or does the method need to work for any speaker from the beginning?
 
 | dataset | num. hours | num. speakers | status     | observations | link |
 |---------|------------|---------------|------------|--------------|------|
