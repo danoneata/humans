@@ -28,7 +28,7 @@ ls /home/doneata/work/humans/data/grid
 **Preparing models.**
 The base path for models is
 ```bash
-ls /home/doneata/work/humans/models
+ls /home/doneata/work/humans/output/models
 ```
 
 # Main functionality
