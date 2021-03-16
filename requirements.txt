@@ -2,3 +2,4 @@ black
 click
 opencv-python
 dlib
+mypy
