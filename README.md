@@ -18,10 +18,33 @@ pip install -U pip
 pip install -r requirements.txt
 ```
 
-**Code style.**
-Please use the [black](https://github.com/psf/black) code formatter.
+**Preparing data.**
+To set up a dataset, define folders for `filelists`, `video` and `face-landmarks`.
+As an example see the GRID dataset at the following location (on the `lenovo` machines):
+```bash
+ls /home/doneata/work/humans/data/grid
+```
 
-# Overview
+# Main functionality
+
+Extract face landmarks:
+
+```bash
+python scripts/extract_face_landmarks.py --dataset grid --filelist tiny --n-cpu 4 -v
+```
+
+# Contributing
+
+**Code style.**
+Please use the [black](https://github.com/psf/black) code formatter to ensure uniform code style.
+
+**Typing.**
+Use [type annotations](https://docs.python.org/3/library/typing.html) where it is sensible to do so and check with [mypy](https://github.com/python/mypy), for example:
+```bash
+mypy scripts/extract_face_landmarks.py
+```
+
+# Technical overview
 
 This section presents an overview of the task and our approach.
 
