@@ -75,7 +75,13 @@ here are some options:
 (See work on 2d pose estimation: [convolutional pose mahcines](https://arxiv.org/abs/1602.00134) or [stacked hourglass networks](https://arxiv.org/abs/1603.06937).)
 - Low-dimensional projection of the concatenated positions.
 We will probably need to center and normalize the positions.
-(See the Obamanet paper, in the references.)
+See the Obamanet paper or the paper by [Suwajanakorn et al. (2017)](https://grail.cs.washington.edu/projects/AudioToObama/siggraph17_obama.pdf), in the references:
+
+> To compute the mouth shape representation, we first detect and frontalize Obama’s face in each video frame using the approach in [Suwajanakorn et al., 2014].
+> For each frontalized face, we detect mouth landmarks using [Xiong and De la Torre 2013] which gives 18 points along the outer and inner contours of the lip.
+> We reshape each 18-point mouth shape into a 36-D vector, apply PCA over all frames, and represent each mouth shape by the coefficients of the first 20 PCA coefficients; this step both reduces dimensionality and decorrelates the resulting feature set.
+> Finally, we temporally upsample the mouth shape from 30 Hz to 100 Hz by linearly interpolating PCA coefficients, to match the audio sampling rate.
+> Note that this upsampling is only used for training.
 
 **Extracting face landmarks.**
 Currently, I'm using [dlib](http://dlib.net/),
