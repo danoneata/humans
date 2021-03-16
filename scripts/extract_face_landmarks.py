@@ -16,9 +16,8 @@ import cv2
 import dlib
 
 
-# TODO Move to shared location
 SHAPE_PREDICTOR_PATH = (
-    "/home/doneata/src/dlib-models/shape_predictor_68_face_landmarks.dat"
+    "models/face-landmarks/dlib/shape_predictor_68_face_landmarks.dat"
 )
 
 
