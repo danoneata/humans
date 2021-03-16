@@ -41,6 +41,7 @@ class Dataset(metaclass=ABCMeta):
         pass
 
     def key_to_str(self, key: Key) -> str:
+        """Overload if you want to pretty print structured keys."""
         return str(Key)
 
 
@@ -91,7 +92,7 @@ class GRID(Dataset):
         return os.path.join(self.folder_video, speaker, video + "." + self.video_ext)
 
     def get_face_landmarks_path(self, key):
-        """Use folder structure similar to the one for videos."""
+        """Use a folder structure similar to the one used for videos."""
         video, speaker = key
         return os.path.join(self.folder_face_landmarks, speaker, video + ".json")
 
