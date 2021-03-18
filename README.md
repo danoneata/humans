@@ -84,9 +84,12 @@ See the Obamanet paper or the paper by [Suwajanakorn et al. (2017)](https://grai
 - Displacements of each landmark relative to previous frame.
 
 **Extracting face landmarks.**
-Currently, I'm using [dlib](http://dlib.net/),
-Dragoș also suggested [this library](https://github.com/1adrianb/face-alignment).
-Maybe try both for a few videos and check differences and timings.
+Various options possible:
+- [dlib](http://dlib.net/), currently used in `scripts/extract_face_landmarks.py`
+- [Adrian Bulat's `face-alignment` library](https://github.com/1adrianb/face-alignment) (suggested by Dragoș)
+- [TensorFlow.js FaceMesh](https://github.com/tensorflow/tfjs-models/tree/master/face-landmarks-detection) (suggested by Adriana)
+
+Maybe try all on a small subset and compare them (also in terms of execution time).
 
 **Data.**
 What datasets should we use for training the model?
@@ -133,4 +136,4 @@ Faces and their landmarks were detected using the [`dlib` toolkit](http://dlib.n
 - Suwajanakorn, Supasorn, Steven M. Seitz, and Ira Kemelmacher-Shlizerman. "Synthesizing Obama: learning lip sync from audio." ACM Transactions on Graphics (ToG) 36.4 (2017): 1-13. [pdf](https://grail.cs.washington.edu/projects/AudioToObama/siggraph17_obama.pdf) · [code](https://github.com/supasorn/synthesizing_obama_network_training)
 - Kumar, Rithesh, et al. "Obamanet: Photo-realistic lip-sync from text." arXiv preprint arXiv:1801.01442 (2017). [pdf](https://arxiv.org/pdf/1801.01442.pdf) · [code](https://github.com/karanvivekbhargava/obamanet) (original implementation) · [code](https://github.com/acvictor/Obama-Lip-Sync) (separate implementation)
 - Fried, Ohad, et al. "Text-based editing of talking-head video." ACM Transactions on Graphics (TOG) 38.4 (2019): 1-14. [pdf](https://dl.acm.org/doi/pdf/10.1145/3306346.3323028)
-- Prajwal, K. R., et al. "A lip sync expert is all you need for speech to lip generation in the wild." Proceedings of the 28th ACM International Conference on Multimedia. 2020. [pdf](http://cvit.iiit.ac.in/research/projects/cvit-projects/a-lip-sync-expert-is-all-you-need-for-speech-to-lip-generation-in-the-wild/)
+- Prajwal, K. R., et al. "A lip sync expert is all you need for speech to lip generation in the wild." Proceedings of the 28th ACM International Conference on Multimedia. 2020. [project](http://cvit.iiit.ac.in/research/projects/cvit-projects/a-lip-sync-expert-is-all-you-need-for-speech-to-lip-generation-in-the-wild/) · [code](https://github.com/Rudrabha/Wav2Lip)
