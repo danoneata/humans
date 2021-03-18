@@ -76,12 +76,12 @@ here are some options:
 - Low-dimensional projection of the concatenated positions.
 We will probably need to center and normalize the positions.
 See the Obamanet paper or the paper by [Suwajanakorn et al. (2017)](https://grail.cs.washington.edu/projects/AudioToObama/siggraph17_obama.pdf), in the references:
-
 > To compute the mouth shape representation, we first detect and frontalize Obama’s face in each video frame using the approach in [Suwajanakorn et al., 2014].
 > For each frontalized face, we detect mouth landmarks using [Xiong and De la Torre 2013] which gives 18 points along the outer and inner contours of the lip.
 > We reshape each 18-point mouth shape into a 36-D vector, apply PCA over all frames, and represent each mouth shape by the coefficients of the first 20 PCA coefficients; this step both reduces dimensionality and decorrelates the resulting feature set.
 > Finally, we temporally upsample the mouth shape from 30 Hz to 100 Hz by linearly interpolating PCA coefficients, to match the audio sampling rate.
 > Note that this upsampling is only used for training.
+- Displacements of each landmark relative to previous frame.
 
 **Extracting face landmarks.**
 Currently, I'm using [dlib](http://dlib.net/),
@@ -98,22 +98,24 @@ Or is this information (the speaker identity) already present in the input audio
 To explicitly circumvent the speaker variability, I would be very tempted to use a single-person dataset (_e.g._, Obama for which there are many video recording available).
 Although, on a second thought, this approach has the disadvantage of being specific to a single type of voice.
 
-_Q_ Business-wise is better to target a single speaker or does the method need to work for any speaker from the beginning?
+- _Q_ Business-wise is better to target a single speaker or does the method need to work for any speaker from the beginning?
+- Follow Dragoș's idea and have a separate upscaling model that learns to interpolate lips landmarks for high resolution videos?
+This approach would allow us to learn on lower resolution videos.
+- If we do not use a multi-task approach (see next sub-sections) then we do not need transcripts and we could potentially crawl our own data from YouTube.
 
-| dataset | num. hours | num. speakers | status     | observations | link |
-|---------|------------|---------------|------------|--------------|------|
-| GRID    |            |               | downloaded | limited vocabulary, constrained conditions | |
-| LRW     |            |               | downloaded |              | [link](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html) |
-| LRS2    |            |               | TODO       |              | [link](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs2.html) |
-| LRS3    |            |               | TODO       |              | [link](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html) |
-| Lip2Wav | 100        | 5             | TODO       |              | [link](https://cove.thecvf.com/datasets/363) |
+| dataset   | num. hours | num. speakers | resolution  | fps | transcripts | observations                               | status     | links                                                                 |
+|-----------|------------|---------------|-------------|-----|-------------|--------------------------------------------|------------|-----------------------------------------------------------------------|
+| GRID      | 28         | 33            | 720 × 576   | 25  | ✓           | limited vocabulary, constrained conditions | downloaded (small videos, 360 × 288) | [paper](https://pubmed.ncbi.nlm.nih.gov/17139705/) [data](http://spandh.dcs.shef.ac.uk/gridcorpus/) |
+| TCD-TIMIT |            | 62            | 1920 × 1080 | 30  | ✓           | constrained conditions, three professionally-trained lip speakers | [N/A?](http://www.mee.tcd.ie/~sigmedia/Resources/TCD-TIMIT) | [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7050271) |
+| LRW       |            |               |             |     | ✓           | single word                                | downloaded | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html)   |
+| LRS2      |            |               |             |     | ✓           |                                            | downloaded | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs2.html)   |
+| LRS3      |            |               |             |     | ✓           |                                            | TODO       | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html)   |
+| Lip2Wav   | 120        | 5             |             |     | ✗           | YouTube videos, diverse vocabulary         | TODO       | [project](http://cvit.iiit.ac.in/research/projects/cvit-projects/speaking-by-observing-lip-movements) [data](https://cove.thecvf.com/datasets/363)                          |
 
 **Intermediate phonetic representation.**
 The model goes between two aligned signals: from audio to lips.
-We could explicitly enforce an intermediate layer to correspond to the phonetic representation,
-but what advantages would bring such a design? Maybe better interpretability?
-In my opinion it would be nice to be able to have choose from two possible input modalities—audio or text—
-but adapting the architecture for this might complicate it too much.
+However, we could explicitly enforce the intermediate layer to correspond to phonetic representation,
+for example, by using a multi-task approach and having a branch that transcribes the audio (predicts text) from the encoded activations.
 
 **An experiment in phoneme-to-lip mapping.**
 A straightforward way of mapping phonemes to lip movements (_visemes_) is by aligning the phonetized transcription to the audio of the video.
@@ -124,7 +126,7 @@ AA, AE, AH, AO, AW, AY, EH, EY, IH, IY, OW, UW.
 For this experiment, we have used the [GRID dataset](https://pubmed.ncbi.nlm.nih.gov/17139705/) and
 obtained the alignments by using a pre-trained automatic speech recognition (ASR) model trained on TED-LIUM with the Kaldi framework
 (but we can also use alignments extracted with [Gentle](https://github.com/lowerquality/gentle)).
-faces and their landmarks were detected using the [`dlib` toolkit](http://dlib.net/).
+Faces and their landmarks were detected using the [`dlib` toolkit](http://dlib.net/).
 
 # References
 
