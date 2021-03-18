@@ -110,27 +110,16 @@ def shape_to_list(shape):
     return [(shape.part(i).x, shape.part(i).y) for i in range(shape.num_parts)]
 
 
-def detect_face_landmarks(detector, predictor, image):
+def detect_face_landmarks_lib(detector, predictor, image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     rects = detector(gray, 1)
     landmarks = [shape_to_list(predictor(gray, rect)) for rect in rects]
     return landmarks
 
 
-def detect_face_alignment(fa, dataset, keys, landmark_type, verbose=0):
-    # input = io.imread('assets/aflw-test.jpg')
-    # preds = fa.get_landmarks(input)
-    for key in keys:
-        if verbose > 0:
-            print(dataset.key_to_str(key))
-        landmarks = [
-            fa.get_landmarks(frame)
-            for frame in iterate_frames(dataset.get_video_path(key))
-        ]
-        out_path = dataset.get_face_landmarks_path(key, landmark_type)
-        make_folder(out_path)
-        with open(out_path, "w") as f:
-            f.write(str(landmarks))
+def detect_face_alignment_fa(fa, image):
+    res = fa.get_landmarks(image)
+    return [r.tolist() for r in res]
 
 
 def iterate_frames(path_video):
@@ -148,14 +137,13 @@ def make_folder(path):
     os.makedirs(folder, exist_ok=True)
 
 
-def extract(dataset, detector, predictor, landmark_type, key, verbose=0):
+def extract(dataset, detect_face_landmarks, landmark_type, key, verbose=0):
     # if os.path.exists(dataset.get_face_landmarks_path(key)):
     #     return
-    # landmark_type = "dlib"
     if verbose > 0:
         print(dataset.key_to_str(key))
     landmarks = [
-        detect_face_landmarks(detector, predictor, frame)
+        detect_face_landmarks(frame)
         for frame in iterate_frames(dataset.get_video_path(key))
     ]
     out_path = dataset.get_face_landmarks_path(key, landmark_type)
@@ -176,7 +164,7 @@ def extract(dataset, detector, predictor, landmark_type, key, verbose=0):
 @click.option("--n-cpu", "n_cpu", default=1, help="number of cores to use")
 @click.option("-v", "--verbose", default=0, count=True, help="how chatty to be")
 @click.option("-lt", "--landmark_type", default="dlib",
-              help="Options: 1. dlib 2. face_alignment (https://github.com/1adrianb/face-alignment)")
+              help="Options: 1. dlib 2. face-alignment (https://github.com/1adrianb/face-alignment)")
 def main(dataset_name, filelist, landmark_type="face_landmarks", n_cpu=1, verbose=0):
     dataset: Dataset = DATASETS[dataset_name]()
     keys = dataset.load_filelist(filelist)
@@ -185,22 +173,24 @@ def main(dataset_name, filelist, landmark_type="face_landmarks", n_cpu=1, verbos
     if landmark_type == "dlib":
         detector = dlib.get_frontal_face_detector()
         predictor = dlib.shape_predictor(SHAPE_PREDICTOR_PATH)
-
-        extract1 = partial(extract, dataset, detector, predictor, landmark_type, verbose=verbose)
-
-        if n_cpu == 1:
-            for key in keys:
-                extract1(key)
-        elif n_cpu > 1:
-            with Pool(n_cpu) as p:
-                p.map(extract1, keys)
-        else:
-            assert False, "Invalid number of processes {}".format(n_cpu)
-    elif landmark_type == "face_alignment":
-        fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False)
-        detect_face_alignment(fa, dataset, keys, landmark_type, verbose=verbose)
+        detect_face_landmarks = partial(detect_face_landmarks_lib, detector, predictor)
+    elif landmark_type == "face-alignment":
+        # TODO How to parallelize when running when CPU?
+        fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device="cuda")
+        detect_face_landmarks = partial(detect_face_alignment_fa, fa)
     else:
         assert False, "Unknown landmark type, please use \"face_landmarks\" or \"face_alignment\""
+
+    extract1 = partial(extract, dataset, detect_face_landmarks, landmark_type, verbose=verbose)
+
+    if n_cpu == 1:
+        for key in keys:
+            extract1(key)
+    elif n_cpu > 1:
+        with Pool(n_cpu) as p:
+            p.map(extract1, keys)
+    else:
+        assert False, "Invalid number of processes {}".format(n_cpu)
 
 
 if __name__ == "__main__":
