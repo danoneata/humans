@@ -3,3 +3,4 @@ click
 opencv-python
 dlib
 mypy
+face-alignment
