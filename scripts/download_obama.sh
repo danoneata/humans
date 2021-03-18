@@ -10,4 +10,5 @@ video_dir="${base_path}/videos"
 
 mkdir -p ${video_dir}
 
+# If there are problems with some videos use `-f best` option for youtube-dl
 parallel --bar -a $filelist -j $n_jobs youtube-dl ${base_url}{} -o "${video_dir}/%\(id\)s.%\(ext\)s"
