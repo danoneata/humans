@@ -16,7 +16,8 @@ BASE_PATH = "/home/doneata/src/synthesizing-obama-network-training/obama_data"
 DATA_PATH = "data/obama"
 
 FPS = 29.97
-EXT = ".mp4"
+EXT_VIDEO = ".mp4"
+EXT_AUDIO = ".wav"
 
 VideoSplit = namedtuple("VideoSplit", "name part start_frame num_frames")
 
@@ -47,10 +48,9 @@ def save_video_splits():
 def split_videos():
     for video_split in get_video_splits():
 
-        src = os.path.join(DATA_PATH, "videos", video_split.name + EXT)
-        dst = os.path.join(
-            DATA_PATH, "videos-split", video_split.name + "-" + video_split.part + EXT
-        )
+        file_name_dst = video_split.name + "-" + video_split.part
+        src = os.path.join(DATA_PATH, "video", video_split.name + EXT_VIDEO)
+        dst = os.path.join(DATA_PATH, "video-split", file_name_dst + EXT_VIDEO)
 
         start = str(video_split.start_frame / FPS)
         duration = str(video_split.num_frames / FPS)
@@ -72,7 +72,20 @@ def split_videos():
 
 
 def extract_audio():
-    pass
+    for video_split in get_video_splits():
+        file_name = video_split.name + "-" + video_split.part
+        src = os.path.join(DATA_PATH, "video-split", file_name + EXT_VIDEO)
+        dst = os.path.join(DATA_PATH, "audio-split", file_name + EXT_AUDIO)
+        subprocess.run(
+            [
+                "ffmpeg",
+                src,
+                "-vn",
+                "-acodec",
+                "copy",
+                dst,
+            ]
+        )
 
 
 @click.command()
