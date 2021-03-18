@@ -114,6 +114,7 @@ This approach would allow us to learn on lower resolution videos.
 | LRS2      |            |               |             |     | ✓           |                                            | downloaded | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs2.html)   |
 | LRS3      |            |               |             |     | ✓           |                                            | TODO       | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html)   |
 | Lip2Wav   | 120        | 5             |             |     | ✗           | YouTube videos, diverse vocabulary         | TODO       | [project](http://cvit.iiit.ac.in/research/projects/cvit-projects/speaking-by-observing-lip-movements) [data](https://cove.thecvf.com/datasets/363)                          |
+| Obama     | 17         | 1             |             | 30? | ✗           | YouTube videos, diverse vocabulary         | TODO       | [paper](https://grail.cs.washington.edu/projects/AudioToObama/siggraph17_obama.pdf) [data](https://github.com/supasorn/synthesizing_obama_network_training) |
 
 **Intermediate phonetic representation.**
 The model goes between two aligned signals: from audio to lips.
@@ -138,3 +139,4 @@ Faces and their landmarks were detected using the [`dlib` toolkit](http://dlib.n
 - Fried, Ohad, et al. "Text-based editing of talking-head video." ACM Transactions on Graphics (TOG) 38.4 (2019): 1-14. [pdf](https://dl.acm.org/doi/pdf/10.1145/3306346.3323028)
 - Prajwal, K. R., et al. "A lip sync expert is all you need for speech to lip generation in the wild." Proceedings of the 28th ACM International Conference on Multimedia. 2020. [project](http://cvit.iiit.ac.in/research/projects/cvit-projects/a-lip-sync-expert-is-all-you-need-for-speech-to-lip-generation-in-the-wild/) · [code](https://github.com/Rudrabha/Wav2Lip)
 - Manocha, Prateek, and Prithwijit Guha. "Facial Keypoint Sequence Generation from Audio." arXiv preprint arXiv:2011.01114 (2020). [paper](https://arxiv.org/pdf/2011.01114v1.pdf)
+- Zhang, Jiangning, et al. "APB2Face: Audio-guided face reenactment with auxiliary pose and blink signals." ICASSP, 2020. [paper](https://arxiv.org/pdf/2004.14569.pdf) · [code & data](https://github.com/zhangzjn/APB2FaceV2)
