@@ -81,6 +81,7 @@ def extract_audio():
         subprocess.run(
             [
                 "ffmpeg",
+                "-i",
                 src,
                 "-vn",
                 "-acodec",
