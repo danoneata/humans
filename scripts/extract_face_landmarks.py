@@ -119,7 +119,10 @@ def detect_face_landmarks_lib(detector, predictor, image):
 
 def detect_face_alignment_fa(fa, image):
     res = fa.get_landmarks(image)
-    return [r.tolist() for r in res]
+    if res:
+        return [r.tolist() for r in res]
+    else:
+        return []
 
 
 def iterate_frames(path_video):
@@ -195,3 +198,4 @@ def main(dataset_name, filelist, landmark_type="face_landmarks", n_cpu=1, verbos
 
 if __name__ == "__main__":
     main()
+
