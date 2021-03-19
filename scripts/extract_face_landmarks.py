@@ -15,7 +15,6 @@ import click
 import cv2
 import dlib
 import face_alignment
-from skimage import io
 
 
 SHAPE_PREDICTOR_PATH = (
@@ -76,7 +75,7 @@ class GRID(Dataset):
 
     def get_video_path(self, key):
         """The videos are organized in subfolders based on the speaker id:
-        
+
         data/grid/video/
         ├── s1
         │   ├── bbaf2n.mpg
@@ -87,7 +86,7 @@ class GRID(Dataset):
         │   ├── bbaf2s.mpg
         │   └── ...
         └── ...
-        
+
         """
         video, speaker = key
         return os.path.join(self.folder_video, speaker, video + "." + self.video_ext)
@@ -111,9 +110,9 @@ def shape_to_list(shape):
 
 
 def detect_face_landmarks_lib(detector, predictor, image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    rects = detector(gray, 1)
-    landmarks = [shape_to_list(predictor(gray, rect)) for rect in rects]
+    image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    faces = detector(image_gray, 1)
+    landmarks = [shape_to_list(predictor(image_gray, face)) for face in faces]
     return landmarks
 
 
@@ -167,10 +166,13 @@ def extract(dataset, detect_face_landmarks, landmark_type, key, verbose=0):
 @click.option("--n-cpu", "n_cpu", default=1, help="number of cores to use")
 @click.option("-v", "--verbose", default=0, count=True, help="how chatty to be")
 @click.option("-lt", "--landmark_type", default="dlib",
-              help="Options: 1. dlib 2. face-alignment (https://github.com/1adrianb/face-alignment)")
-def main(dataset_name, filelist, landmark_type="face_landmarks", n_cpu=1, verbose=0):
+              help="options: 1. dlib 2. face-alignment (see https://github.com/1adrianb/face-alignment)")
+def main(dataset_name, filelist, landmark_type="dlib", n_cpu=1, verbose=0):
     dataset: Dataset = DATASETS[dataset_name]()
     keys = dataset.load_filelist(filelist)
+
+    if landmark_type == "face-alignment":
+        assert n_cpu == 1, "face-alignment extractor not implemented for parallel running"
 
     # Load face detection and alignment models
     if landmark_type == "dlib":
@@ -182,7 +184,7 @@ def main(dataset_name, filelist, landmark_type="face_landmarks", n_cpu=1, verbos
         fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device="cuda")
         detect_face_landmarks = partial(detect_face_alignment_fa, fa)
     else:
-        assert False, "Unknown landmark type, please use \"face_landmarks\" or \"face_alignment\""
+        assert False, "Unknown landmark type, please use 'face_landmarks' or 'face_alignment'"
 
     extract1 = partial(extract, dataset, detect_face_landmarks, landmark_type, verbose=verbose)
 
