@@ -134,8 +134,8 @@ Running the methods on 10 video samples from the GRID dataset at resolution 360 
 |------------------------|-------|-------------|------------------|----------|
 | dlib (1 CPU)           | GRID  |  360 × 288  | 0.04             | TODO     |
 | face-alignment (1 GPU) | GRID  |  360 × 288  | 0.09             | TODO     |
-| dlib (1 CPU)           | Obama |  640 × 360  |                  | TODO     |
-| face-alignment (1 GPU) | Obama |  640 × 360  |                  | TODO     |
+| dlib (1 CPU)           | Obama |  640 × 360  | 0.09             | TODO     |
+| face-alignment (1 GPU) | Obama |  640 × 360  | 0.11             | TODO     |
 
 **Data.**
 What datasets should we use for training the model?
