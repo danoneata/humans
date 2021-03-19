@@ -14,10 +14,12 @@ from typing import Any, List
 import click
 import cv2
 import dlib
+import face_alignment
+from skimage import io
 
 
 SHAPE_PREDICTOR_PATH = (
-    "models/face-landmarks/dlib/shape_predictor_68_face_landmarks.dat"
+    "output/models/face-landmarks/dlib/shape_predictor_68_face_landmarks.dat"
 )
 
 
@@ -36,7 +38,7 @@ class Dataset(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def get_face_landmarks_path(self, key: Key) -> Path:
+    def get_face_landmarks_path(self, key: Key, lt) -> Path:
         pass
 
     def key_to_str(self, key: Key) -> str:
@@ -90,10 +92,10 @@ class GRID(Dataset):
         video, speaker = key
         return os.path.join(self.folder_video, speaker, video + "." + self.video_ext)
 
-    def get_face_landmarks_path(self, key):
+    def get_face_landmarks_path(self, key, lt):
         """Use a folder structure similar to the one used for videos."""
         video, speaker = key
-        return os.path.join(self.folder_face_landmarks, speaker, video + ".json")
+        return os.path.join(self.folder_face_landmarks, lt, speaker, video + ".json")
 
     def key_to_str(self, key):
         return " ".join(key)
@@ -108,11 +110,16 @@ def shape_to_list(shape):
     return [(shape.part(i).x, shape.part(i).y) for i in range(shape.num_parts)]
 
 
-def detect_face_landmarks(detector, predictor, image):
+def detect_face_landmarks_lib(detector, predictor, image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     rects = detector(gray, 1)
     landmarks = [shape_to_list(predictor(gray, rect)) for rect in rects]
     return landmarks
+
+
+def detect_face_alignment_fa(fa, image):
+    res = fa.get_landmarks(image)
+    return [r.tolist() for r in res]
 
 
 def iterate_frames(path_video):
@@ -130,16 +137,16 @@ def make_folder(path):
     os.makedirs(folder, exist_ok=True)
 
 
-def extract(dataset, detector, predictor, key, verbose=0):
+def extract(dataset, detect_face_landmarks, landmark_type, key, verbose=0):
     # if os.path.exists(dataset.get_face_landmarks_path(key)):
     #     return
     if verbose > 0:
         print(dataset.key_to_str(key))
     landmarks = [
-        detect_face_landmarks(detector, predictor, frame)
+        detect_face_landmarks(frame)
         for frame in iterate_frames(dataset.get_video_path(key))
     ]
-    out_path = dataset.get_face_landmarks_path(key)
+    out_path = dataset.get_face_landmarks_path(key, landmark_type)
     make_folder(out_path)
     with open(out_path, "w") as f:
         json.dump(landmarks, f)
@@ -156,15 +163,25 @@ def extract(dataset, detector, predictor, key, verbose=0):
 @click.option("-f", "--filelist", help="specifies list of videos to process")
 @click.option("--n-cpu", "n_cpu", default=1, help="number of cores to use")
 @click.option("-v", "--verbose", default=0, count=True, help="how chatty to be")
-def main(dataset_name, filelist, n_cpu=1, verbose=0):
+@click.option("-lt", "--landmark_type", default="dlib",
+              help="Options: 1. dlib 2. face-alignment (https://github.com/1adrianb/face-alignment)")
+def main(dataset_name, filelist, landmark_type="face_landmarks", n_cpu=1, verbose=0):
     dataset: Dataset = DATASETS[dataset_name]()
     keys = dataset.load_filelist(filelist)
 
     # Load face detection and alignment models
-    detector = dlib.get_frontal_face_detector()
-    predictor = dlib.shape_predictor(SHAPE_PREDICTOR_PATH)
+    if landmark_type == "dlib":
+        detector = dlib.get_frontal_face_detector()
+        predictor = dlib.shape_predictor(SHAPE_PREDICTOR_PATH)
+        detect_face_landmarks = partial(detect_face_landmarks_lib, detector, predictor)
+    elif landmark_type == "face-alignment":
+        # TODO How to parallelize when running when CPU?
+        fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device="cuda")
+        detect_face_landmarks = partial(detect_face_alignment_fa, fa)
+    else:
+        assert False, "Unknown landmark type, please use \"face_landmarks\" or \"face_alignment\""
 
-    extract1 = partial(extract, dataset, detector, predictor, verbose=verbose)
+    extract1 = partial(extract, dataset, detect_face_landmarks, landmark_type, verbose=verbose)
 
     if n_cpu == 1:
         for key in keys:
