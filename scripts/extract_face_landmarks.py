@@ -119,7 +119,7 @@ def detect_face_landmarks_lib(detector, predictor, image):
 def detect_face_alignment_fa(fa, image):
     res = fa.get_landmarks(image)
     if res:
-        return [r.tolist() for r in res]
+        return [r.astype(int).tolist() for r in res]
     else:
         return []
 
