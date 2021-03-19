@@ -91,19 +91,50 @@ def extract_audio():
         # fmt: on
 
 
+def resize_videos(resolution):
+    if resolution == "360p":
+        size = "640x360"
+    elif resolution == "480p":
+        size = "854x480"
+    else:
+        assert False
+    for video_split in get_video_splits():
+        file_name = video_split.name + "-" + video_split.part
+        src = os.path.join(DATA_PATH, "video-split", file_name + EXT_VIDEO)
+        dst = os.path.join(DATA_PATH, "video-split-" + resolution, file_name + EXT_VIDEO)
+        # fmt: off
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-i", src,
+                "-s", size,
+                "-c:a", "copy",
+                dst,
+            ]
+        )
+        # fmt: on
+
+
 @click.command()
 @click.option(
     "-t",
     "--todo",
-    type=click.Choice(["save-filelist", "split-videos", "extract-audio"]),
+    type=click.Choice(["save-filelist", "split-videos", "extract-audio", "resize-videos"]),
 )
-def main(todo):
+@click.option(
+    "-r",
+    "--resolution",
+    type=click.Choice(["360p", "480p"]),
+)
+def main(todo, resolution=None):
     if todo == "save-filelist":
         save_video_splits()
     elif todo == "split-videos":
         split_videos()
     elif todo == "extract-audio":
         extract_audio()
+    elif todo == "resize-videos":
+        resize_videos(resolution)
     else:
         assert False
 
