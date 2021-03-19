@@ -61,10 +61,13 @@ def split_videos():
                 str(start),
                 "-i",
                 src,
+                # "-y",
                 "-t",
-                "-c",
-                "copy",
                 str(duration),
+                "-c:v",
+                "libx264",
+                "-c:a",
+                "aac",
                 dst,
             ]
         )
