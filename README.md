@@ -33,7 +33,9 @@ ls /home/doneata/work/humans/output/models
 
 # Datasets
 
-**Obama.**
+## Obama's weekly addresses
+
+**Data preparation.**
 Steps to reproduce the processing for the Obama dataset.
 1. Download the dataset:
 ```bash
@@ -46,6 +48,24 @@ python scripts/obama/process_videos.sh -t split-video
 3. Extract the audio:
 ```bash
 python scripts/obama/process_videos.sh -t extract-audio
+```
+
+**Characteristics.**
+- Duration: 17 hours
+- Number of frames: 1.8M
+- Frames per second: 29.97
+- Video resolutions:
+```
+count | resolution
+------|------------
+   32 | 1920 × 1080
+  260 | 1280 ×  720
+    1 |  854 ×  480
+    8 |  640 ×  360
+```
+Obtained with the following command:
+```bash
+/bin/ls -1 data/obama/video/ | parallel ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 data/obama/video/{} | sort | uniq -c
 ```
 
 # Main functionality
@@ -108,12 +128,14 @@ Various options possible:
 
 Maybe try all on a small subset and compare them (also in terms of execution time).
 
-Running the methods on 10 video samples from the GRID dataset at resolution 360 × 288.
+Running the methods on 10 video samples from the GRID dataset at resolution 360 × 288 and Obama dataset at downscaled to 640 × 360.
 
-| method                 | time (s) / frame | examples |
-|------------------------|------------------|----------|
-| dlib (1 CPU)           | 0.04             |          |
-| face-alignment (1 GPU) | 0.09             |          |
+| method                 | data  | resolution  | time (s) / frame | examples |
+|------------------------|-------|-------------|------------------|----------|
+| dlib (1 CPU)           | GRID  |  360 × 288  | 0.04             | TODO     |
+| face-alignment (1 GPU) | GRID  |  360 × 288  | 0.09             | TODO     |
+| dlib (1 CPU)           | Obama |  640 × 360  |                  | TODO     |
+| face-alignment (1 GPU) | Obama |  640 × 360  |                  | TODO     |
 
 **Data.**
 What datasets should we use for training the model?
@@ -136,9 +158,9 @@ This approach would allow us to learn on lower resolution videos.
 | TCD-TIMIT |            | 62            | 1920 × 1080 | 30  | ✓           | constrained conditions, three professionally-trained lip speakers | [N/A?](http://www.mee.tcd.ie/~sigmedia/Resources/TCD-TIMIT) | [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7050271)                                                                                       |
 | LRW       |            |               |             |     | ✓           | single word                                                       | downloaded                                                  | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html)                                                                                         |
 | LRS2      |            |               |             |     | ✓           |                                                                   | downloaded                                                  | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs2.html)                                                                                         |
-| LRS3      |            |               |             |     | ✓           |                                                                   | TODO                                                        | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html)                                                                                         |
+| LRS3      |            |               |             |     | ✓           |                                                                   | in progress                                                 | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html)                                                                                         |
 | Lip2Wav   | 120        | 5             |             |     | ✗           | YouTube videos, diverse vocabulary                                | TODO                                                        | [project](http://cvit.iiit.ac.in/research/projects/cvit-projects/speaking-by-observing-lip-movements) [data](https://cove.thecvf.com/datasets/363)          |
-| Obama     | 17         | 1             |             | 30? | ✗           | YouTube videos, diverse vocabulary                                | in progress                                                 | [paper](https://grail.cs.washington.edu/projects/AudioToObama/siggraph17_obama.pdf) [data](https://github.com/supasorn/synthesizing_obama_network_training) |
+| Obama     | 17         | 1             | 1280 × 720  | 30? | ?           | YouTube videos, diverse vocabulary                                | in progress                                                 | [paper](https://grail.cs.washington.edu/projects/AudioToObama/siggraph17_obama.pdf) [data](https://github.com/supasorn/synthesizing_obama_network_training) |
 
 **Intermediate phonetic representation.**
 The model goes between two aligned signals: from audio to lips.
