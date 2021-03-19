@@ -31,6 +31,23 @@ The base path for models is
 ls /home/doneata/work/humans/output/models
 ```
 
+# Datasets
+
+**Obama.**
+Steps to reproduce the processing for the Obama dataset.
+1. Download the dataset:
+```bash
+bash scripts/obama/download.sh
+```
+2. Split the videos:
+```bash
+python scripts/obama/process_videos.sh -t split-video
+```
+3. Extract the audio:
+```bash
+python scripts/obama/process_videos.sh -t extract-audio
+```
+
 # Main functionality
 
 Extract face landmarks:
@@ -91,6 +108,13 @@ Various options possible:
 
 Maybe try all on a small subset and compare them (also in terms of execution time).
 
+Running the methods on 10 video samples from the GRID dataset at resolution 360 × 288.
+
+| method                 | time (s) / frame | examples |
+|------------------------|------------------|----------|
+| dlib (1 CPU)           | 0.04             |          |
+| face-alignment (1 GPU) | 0.09             |          |
+
 **Data.**
 What datasets should we use for training the model?
 We need pairs of audio and front video recordings;
@@ -106,15 +130,15 @@ Although, on a second thought, this approach has the disadvantage of being speci
 This approach would allow us to learn on lower resolution videos.
 - If we do not use a multi-task approach (see next sub-sections) then we do not need transcripts and we could potentially crawl our own data from YouTube.
 
-| dataset   | num. hours | num. speakers | resolution  | fps | transcripts | observations                               | status     | links                                                                 |
-|-----------|------------|---------------|-------------|-----|-------------|--------------------------------------------|------------|-----------------------------------------------------------------------|
-| GRID      | 28         | 33            | 720 × 576   | 25  | ✓           | limited vocabulary, constrained conditions | downloaded (small videos, 360 × 288) | [paper](https://pubmed.ncbi.nlm.nih.gov/17139705/) [data](http://spandh.dcs.shef.ac.uk/gridcorpus/) |
-| TCD-TIMIT |            | 62            | 1920 × 1080 | 30  | ✓           | constrained conditions, three professionally-trained lip speakers | [N/A?](http://www.mee.tcd.ie/~sigmedia/Resources/TCD-TIMIT) | [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7050271) |
-| LRW       |            |               |             |     | ✓           | single word                                | downloaded | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html)   |
-| LRS2      |            |               |             |     | ✓           |                                            | downloaded | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs2.html)   |
-| LRS3      |            |               |             |     | ✓           |                                            | TODO       | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html)   |
-| Lip2Wav   | 120        | 5             |             |     | ✗           | YouTube videos, diverse vocabulary         | TODO       | [project](http://cvit.iiit.ac.in/research/projects/cvit-projects/speaking-by-observing-lip-movements) [data](https://cove.thecvf.com/datasets/363)                          |
-| Obama     | 17         | 1             |             | 30? | ✗           | YouTube videos, diverse vocabulary         | TODO       | [paper](https://grail.cs.washington.edu/projects/AudioToObama/siggraph17_obama.pdf) [data](https://github.com/supasorn/synthesizing_obama_network_training) |
+| dataset   | num. hours | num. speakers | resolution  | fps | transcripts | observations                                                      | status                                                      | links                                                                                                                                                       |
+|-----------|------------|---------------|-------------|-----|-------------|-------------------------------------------------------------------|-------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| GRID      | 28         | 33            | 720 × 576   | 25  | ✓           | limited vocabulary, constrained conditions                        | downloaded (small videos, 360 × 288)                        | [paper](https://pubmed.ncbi.nlm.nih.gov/17139705/) [data](http://spandh.dcs.shef.ac.uk/gridcorpus/)                                                         |
+| TCD-TIMIT |            | 62            | 1920 × 1080 | 30  | ✓           | constrained conditions, three professionally-trained lip speakers | [N/A?](http://www.mee.tcd.ie/~sigmedia/Resources/TCD-TIMIT) | [paper](https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=7050271)                                                                                       |
+| LRW       |            |               |             |     | ✓           | single word                                                       | downloaded                                                  | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrw1.html)                                                                                         |
+| LRS2      |            |               |             |     | ✓           |                                                                   | downloaded                                                  | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs2.html)                                                                                         |
+| LRS3      |            |               |             |     | ✓           |                                                                   | TODO                                                        | [data](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html)                                                                                         |
+| Lip2Wav   | 120        | 5             |             |     | ✗           | YouTube videos, diverse vocabulary                                | TODO                                                        | [project](http://cvit.iiit.ac.in/research/projects/cvit-projects/speaking-by-observing-lip-movements) [data](https://cove.thecvf.com/datasets/363)          |
+| Obama     | 17         | 1             |             | 30? | ✗           | YouTube videos, diverse vocabulary                                | in progress                                                 | [paper](https://grail.cs.washington.edu/projects/AudioToObama/siggraph17_obama.pdf) [data](https://github.com/supasorn/synthesizing_obama_network_training) |
 
 **Intermediate phonetic representation.**
 The model goes between two aligned signals: from audio to lips.
