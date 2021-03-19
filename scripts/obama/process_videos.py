@@ -47,25 +47,24 @@ def save_video_splits():
 
 def split_videos():
     for video_split in get_video_splits():
-
         file_name_dst = video_split.name + "-" + video_split.part
         src = os.path.join(DATA_PATH, "video", video_split.name + EXT_VIDEO)
         dst = os.path.join(DATA_PATH, "video-split", file_name_dst + EXT_VIDEO)
 
-        start = str(video_split.start_frame / FPS)
-        duration = str(video_split.num_frames / FPS)
+        start = (video_split.start_frame - 1) / FPS
+        duration = (video_split.num_frames - 1) / FPS
 
         subprocess.run(
             [
                 "ffmpeg",
                 "-ss",
-                start,
+                str(start),
                 "-i",
                 src,
                 "-t",
-                duration,
                 "-c",
                 "copy",
+                str(duration),
                 dst,
             ]
         )
