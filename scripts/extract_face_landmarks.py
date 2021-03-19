@@ -2,6 +2,7 @@ import itertools
 import json
 import os
 import pdb
+# import warnings
 
 from abc import ABCMeta, abstractmethod
 
@@ -9,7 +10,9 @@ from functools import partial
 
 from multiprocessing import Pool
 
-from typing import Any, List
+import numpy as np
+
+from typing import Any, List, Optional, Tuple
 
 import click
 import cv2
@@ -139,6 +142,31 @@ def make_folder(path):
     os.makedirs(folder, exist_ok=True)
 
 
+def landmarks_to_numpy(landmarks: List[List[List[Tuple]]]) -> Optional[np.ndarray]:
+    """The three nested `List`s iterate over (ⅰ) frames, (ⅱ) faces, and
+    (ⅲ) landmarks. The `Tuple` corresponds to the xy coördinates of the 2D
+    position of each landmark.
+
+    Update: This function is currently not used because, surprisingly, storing
+    the data as a NumPy array is more inefficient than storing it as JSON. The
+    reason is that the coördinates are small numbers and they are better
+    encoded by ASCII. See this StackOverflow answer for a more detailed
+    discussion:
+
+    https://stackoverflow.com/a/53408785/474311
+
+    """
+    # Exit early if faces are either missing or more than one is detected.
+    have_one_face = all(len(landmarks_frame) == 1 for landmarks_frame in landmarks)
+    if not have_one_face:
+        return None
+    # Select the landmarks for the first (and only) face in each frame.
+    landmarks1: List[List[Tuple]] = [landmarks_frame[0] for landmarks_frame in landmarks]
+    landmarks_np = np.stack(landmarks1)
+    landmarks_np = landmarks_np.astype(int)
+    return landmarks_np
+
+
 def extract(dataset, detect_face_landmarks, landmark_type, key, verbose=0):
     # if os.path.exists(dataset.get_face_landmarks_path(key)):
     #     return
@@ -149,6 +177,12 @@ def extract(dataset, detect_face_landmarks, landmark_type, key, verbose=0):
         for frame in iterate_frames(dataset.get_video_path(key))
     ]
     out_path = dataset.get_face_landmarks_path(key, landmark_type)
+    # landmarks_np = landmarks_to_numpy(landmarks)
+    # if landmarks_np is not None:
+    #     make_folder(out_path)
+    #     np.save(out_path, landmarks_np)
+    # else:
+    #     warnings.warn("WARN Not all frames contain extactly one face " + key)
     make_folder(out_path)
     with open(out_path, "w") as f:
         json.dump(landmarks, f)
