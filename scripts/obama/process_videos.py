@@ -54,23 +54,23 @@ def split_videos():
         start = (video_split.start_frame - 1) / FPS
         duration = (video_split.num_frames - 1) / FPS
 
+        # fmt: off
         subprocess.run(
             [
                 "ffmpeg",
-                "-ss",
-                str(start),
-                "-i",
-                src,
+                "-ss", str(start),
+                "-i", src,
+                # Flag to overwrite destination file if it already exists.
                 # "-y",
-                "-t",
-                str(duration),
-                "-c:v",
-                "libx264",
-                "-c:a",
-                "aac",
+                "-t", str(duration),
+                # Reëncoding the video—it is slow, but also much more accurate
+                # than the `-c copy` option.
+                "-c:v", "libx264",
+                "-c:a", "aac",
                 dst,
             ]
         )
+        # fmt: on
 
 
 def extract_audio():
@@ -78,17 +78,17 @@ def extract_audio():
         file_name = video_split.name + "-" + video_split.part
         src = os.path.join(DATA_PATH, "video-split", file_name + EXT_VIDEO)
         dst = os.path.join(DATA_PATH, "audio-split", file_name + EXT_AUDIO)
+        # fmt: off
         subprocess.run(
             [
                 "ffmpeg",
-                "-i",
-                src,
+                "-i", src,
                 "-vn",
-                "-acodec",
-                "copy",
+                "-acodec", "copy",
                 dst,
             ]
         )
+        # fmt: on
 
 
 @click.command()
