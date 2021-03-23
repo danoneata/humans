@@ -82,6 +82,36 @@ class GRID(Dataset):
         return " ".join(key)
 
 
+class Obama(Dataset):
+    """Dataset containing Obama's weekly speeches. For more information see the
+    README.md and this GitLab issue:
+
+    https://gitlab.com/zevo-tech/humans/-/issues/11
+
+    """
+
+    base_path = "data/obama"
+    video_ext = "mp4"
+
+    folder_video = os.path.join(base_path, "video-split-360p")
+    # Path to face landmarks extracted by Cristi using `dlib`.
+    folder_face_landmarks = os.path.join(base_path, "face-landmarks-360p")
+
+    def load_filelist(self, filelist):
+        path = os.path.join(self.base_path, "filelists", filelist + ".txt")
+        with open(path, "r") as f:
+            return [line.strip() for line in f.readlines()]
+
+    def get_video_path(self, key):
+        return os.path.join(self.folder_video, key + "." + self.video_ext)
+
+    def get_face_landmarks_path(self, key, landmark_type="dlib"):
+        """Use a folder structure similar to the one used for videos."""
+        return os.path.join(self.folder_face_landmarks, landmark_type, key + ".json")
+
+
 DATASETS = {
     "grid": GRID,
+    # TODO Parameterize dataset by video size.
+    "obama-360p": Obama,
 }
