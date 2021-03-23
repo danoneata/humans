@@ -16,6 +16,8 @@ Install requirements:
 ```bash
 pip install -U pip
 pip install -r requirements.txt
+# install our package locally to allow for imports
+pip install -e .
 ```
 
 **Preparing data.**
@@ -74,6 +76,12 @@ Extract face landmarks:
 
 ```bash
 python scripts/extract_face_landmarks.py --dataset grid --filelist tiny --n-cpu 4 -v
+```
+
+**Visualize results.**
+Using [Streamlit](https://streamlit.io/), we can easily view the intermediate steps of our pipeline.
+```bash
+streamlit run scripts/show_results.py
 ```
 
 # Contributing
