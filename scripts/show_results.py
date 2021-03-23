@@ -1,4 +1,5 @@
 import json
+import os
 
 from matplotlib import pyplot as plt
 
@@ -6,19 +7,21 @@ import cv2
 
 import streamlit as st
 
-from data import DATASETS
-from scripts.extract_face_landmarks import iterate_frames
 from constants import LANDMARKS_INDICES
+from data import Obama
+from scripts.extract_face_landmarks import iterate_frames
+from utils import normalize_face
 
 
+LANDMARKS_TYPE = "dlib"
 LANDMARKS_COLORS = {
     "face": (0.682, 0.780, 0.909, 0.5),
-    "eyebrow1": (1.0, 0.498, 0.055, 0.4),
-    "eyebrow2": (1.0, 0.498, 0.055, 0.4),
+    "eyebrow-l": (1.0, 0.498, 0.055, 0.4),
+    "eyebrow-r": (1.0, 0.498, 0.055, 0.4),
     "nose": (0.345, 0.239, 0.443, 0.4),
     "nostril": (0.345, 0.239, 0.443, 0.4),
-    "eye1": (0.596, 0.875, 0.541, 0.3),
-    "eye2": (0.596, 0.875, 0.541, 0.3),
+    "eye-l": (0.596, 0.875, 0.541, 0.3),
+    "eye-r": (0.596, 0.875, 0.541, 0.3),
     "lips": (0.596, 0.875, 0.541, 0.3),
     "teeth": (0.596, 0.875, 0.541, 0.4),
 }
@@ -27,8 +30,8 @@ LANDMARKS_COLORS = {
 def overlay_lips(image, landmarks):
     fig, ax = plt.subplots()
     ax.imshow(image)
-    for k, idxs in LANDMARKS_INDICES.items():
-        xs, ys = zip(*landmarks[idxs])
+    for k, (α, ω) in LANDMARKS_INDICES.items():
+        xs, ys = zip(*landmarks[α: ω])
         ax.plot(
             xs,
             ys,
@@ -45,7 +48,8 @@ def overlay_lips(image, landmarks):
 
 def show1(dataset, key):
     video_path = dataset.get_video_path(key)
-    landmarks_path = dataset.get_face_landmarks_path(key)
+    video_normalized_path = os.path.join("output", dataset.name, LANDMARKS_TYPE, key + ".mp4")
+    landmarks_path = dataset.get_face_landmarks_path(key, landmark_type=LANDMARKS_TYPE)
 
     with open(landmarks_path, "r") as f:
         landmarks = json.load(f)
@@ -55,18 +59,23 @@ def show1(dataset, key):
         landmarks_face, *_ = landmarks_frame
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         fig = overlay_lips(frame_rgb, landmarks_face)
+        # image2 = normalize_face(frame, landmarks_face)
+        # fig2, ax = plt.subplots()
+        # ax.imshow(image2)
         # for testing purposes show results only for the first frame
         break
 
     # show
     st.markdown("Key: `{}`".format(key))
     st.video(video_path)
-    st.pyplot(fig)
+    st.video(video_normalized_path)
+    # st.pyplot(fig)
+    # st.pyplot(fig2)
     st.markdown("---")
 
 
 def main():
-    dataset = DATASETS["obama-360p"]()
+    dataset = Obama()
     keys = dataset.load_filelist("video-splits")
     for key in keys[:5]:
         show1(dataset, key)

@@ -18,6 +18,7 @@ import dlib
 import face_alignment
 
 from data import DATASETS, Dataset
+from utils import make_folder
 
 
 SHAPE_PREDICTOR_PATH = (
@@ -51,12 +52,6 @@ def iterate_frames(path_video):
         if not ret:
             break
         yield image
-
-
-def make_folder(path):
-    """Given a path to a file it creates the folder if it is missing."""
-    folder, file_ = os.path.split(path)
-    os.makedirs(folder, exist_ok=True)
 
 
 def landmarks_to_numpy(landmarks: List[List[List[Tuple]]]) -> Optional[np.ndarray]:

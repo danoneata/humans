@@ -36,6 +36,7 @@ class GRID(Dataset):
 
     """
 
+    name = "grid"
     base_path = "data/grid"
     video_ext = "mpg"
 
@@ -90,6 +91,7 @@ class Obama(Dataset):
 
     """
 
+    name = "obama"
     base_path = "data/obama"
     video_ext = "mp4"
 
