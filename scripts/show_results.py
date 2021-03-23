@@ -27,7 +27,7 @@ LANDMARKS_COLORS = {
 }
 
 
-def overlay_lips(image, landmarks):
+def overlay_landmarks(image, landmarks):
     fig, ax = plt.subplots()
     ax.imshow(image)
     for k, (α, ω) in LANDMARKS_INDICES.items():
@@ -48,7 +48,9 @@ def overlay_lips(image, landmarks):
 
 def show1(dataset, key):
     video_path = dataset.get_video_path(key)
-    video_normalized_path = os.path.join("output", dataset.name, LANDMARKS_TYPE, key + ".mp4")
+    dir_results = os.path.join("output", dataset.name, LANDMARKS_TYPE)
+    video_norm_path = os.path.join(dir_results, key + "-norm.mp4")
+    video_lips_path = os.path.join(dir_results, key + "-lips.mp4")
     landmarks_path = dataset.get_face_landmarks_path(key, landmark_type=LANDMARKS_TYPE)
 
     with open(landmarks_path, "r") as f:
@@ -58,19 +60,16 @@ def show1(dataset, key):
         # pick landmarks for the first (and only) face
         landmarks_face, *_ = landmarks_frame
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        fig = overlay_lips(frame_rgb, landmarks_face)
-        # image2 = normalize_face(frame, landmarks_face)
-        # fig2, ax = plt.subplots()
-        # ax.imshow(image2)
+        fig = overlay_landmarks(frame_rgb, landmarks_face)
         # for testing purposes show results only for the first frame
         break
 
     # show
     st.markdown("Key: `{}`".format(key))
     st.video(video_path)
-    st.video(video_normalized_path)
+    st.video(video_norm_path)
+    st.video(video_lips_path)
     # st.pyplot(fig)
-    # st.pyplot(fig2)
     st.markdown("---")
 
 
