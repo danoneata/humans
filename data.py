@@ -2,7 +2,7 @@ import os
 
 from abc import ABCMeta, abstractmethod
 
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # Type aliases, mostly for readability purposes
 Path = str
@@ -101,6 +101,12 @@ class Obama(Dataset):
         path = os.path.join(self.base_path, "filelists", filelist + ".txt")
         with open(path, "r") as f:
             return [line.strip() for line in f.readlines()]
+
+    # def load_filelist_json(self, filelist):
+    #     path = os.path.join(self.base_path, "filelists", filelist + ".json")
+    #     with open(path, "r") as f:
+    #         data = json.load(f)
+    #         return [datum["name"] + "-" + datum["part"] for datum in data]
 
     def get_video_path(self, key):
         return os.path.join(self.folder_video, key + "." + self.video_ext)
