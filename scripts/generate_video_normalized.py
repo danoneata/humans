@@ -29,6 +29,7 @@ def normalize_video(dataset, key):
 
     dir_out = os.path.join("output", dataset.name, LANDMARKS_TYPE)
     video_path_i = dataset.get_video_path(key)
+    audio_path_i = os.path.join(dataset.base_path, "audio-split", key + ".wav")
     get_video_path = lambda suffix, ext: os.path.join(
         dir_out, key + "-" + suffix + "." + ext
     )
@@ -68,13 +69,16 @@ def normalize_video(dataset, key):
     # using streamlit
     for t in ("norm", "lips"):
         subprocess.run(
+            # Q how to audio to the created video?!
             [
                 "ffmpeg",
                 "-y",
-                "-i",
-                get_video_path(t, "avi"),
-                "-vcodec",
-                "libx264",
+                "-i", get_video_path(t, "avi"),
+                # "-i", audio_path_i,
+                "-vcodec", "libx264",
+                # "-acodec", "aac",
+                # "-map", "0:v:0",
+                # "-map", "1:a:0",
                 get_video_path(t, "mp4"),
             ]
         )
