@@ -61,9 +61,6 @@ def normalize_video(dataset, key):
         video_norm.write(frame_norm)
         video_lips.write(frame_lips)
 
-        if i == 120:
-            break
-
     video_norm.release()
     video_lips.release()
 
