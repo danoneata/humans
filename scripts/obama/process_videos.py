@@ -12,7 +12,8 @@ import click
 
 # Folder from repo
 # https://github.com/supasorn/synthesizing_obama_network_training/tree/master
-BASE_PATH = "/home/doneata/src/synthesizing-obama-network-training/obama_data"
+INFO_PATH = os.path.expanduser("~/src/synthesizing-obama-network-training")
+INFO_PATH = os.environ.get("INFO_PATH", INFO_PATH)
 DATA_PATH = "data/obama"
 
 FPS = 29.97
@@ -24,16 +25,18 @@ VideoSplit = namedtuple("VideoSplit", "name part start_frame num_frames")
 
 def get_video_split(folder) -> VideoSplit:
     name, part = folder.split("}}")
-    with open(os.path.join(BASE_PATH, folder, "startframe.txt"), "r") as f:
+    path = os.path.join(INFO_PATH, "obama_data", folder)
+    with open(os.path.join(path, "startframe.txt"), "r") as f:
         start_frame = int(f.read())
-    with open(os.path.join(BASE_PATH, folder, "nframe.txt"), "r") as f:
+    with open(os.path.join(path, "nframe.txt"), "r") as f:
         num_frames = int(f.read())
     return VideoSplit(name, part, start_frame, num_frames)
 
 
 def get_video_splits() -> List[VideoSplit]:
-    paths = os.listdir(BASE_PATH)
-    folders = filter(lambda p: os.path.isdir(os.path.join(BASE_PATH, p)), paths)
+    folder = os.path.join(INFO_PATH, "obama_data")
+    paths = os.listdir(folder)
+    folders = filter(lambda p: os.path.isdir(os.path.join(folder, p)), paths)
     folders = filter(lambda f: f != "audio", folders)
     return list(map(get_video_split, sorted(folders)))
 
