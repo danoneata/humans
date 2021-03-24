@@ -39,17 +39,27 @@ ls /home/doneata/work/humans/output/models
 
 **Data preparation.**
 Steps to reproduce the processing for the Obama dataset.
-1. Download the dataset:
+1. Clone the repo [`synthesizing_obama_network_training`](https://github.com/supasorn/synthesizing_obama_network_training), which contains video names and information regarding the video shots;
+then create the filelist with video names.
+```bash
+git clone git@github.com:supasorn/synthesizing_obama_network_training.git synthesizing-obama-network-training
+/bin/ls -1 synthesizing-obama-network-training/obama_data > data/obama/filelists/video-names.txt
+```
+2. Download the dataset:
 ```bash
 bash scripts/obama/download.sh
 ```
-2. Split the videos:
+3. Split the videos:
 ```bash
-python scripts/obama/process_videos.sh -t split-video
+INFO_PATH=synthesizing-obama-network-training python scripts/obama/process_videos.sh -t split-video
 ```
-3. Extract the audio:
+4. Extract the audio:
 ```bash
-python scripts/obama/process_videos.sh -t extract-audio
+INFO_PATH=synthesizing-obama-network-training python scripts/obama/process_videos.sh -t extract-audio
+```
+5. Resize the videos:
+```bash
+INFO_PATH=synthesizing-obama-network-training python scripts/obama/process_videos.sh -t resize-videos -r 360p
 ```
 
 **Characteristics.**
