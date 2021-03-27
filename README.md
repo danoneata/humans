@@ -61,6 +61,15 @@ INFO_PATH=synthesizing-obama-network-training python scripts/obama/process_video
 ```bash
 INFO_PATH=synthesizing-obama-network-training python scripts/obama/process_videos.sh -t resize-videos -r 360p
 ```
+6. Generate train, validation and test splits (note that two video shots were removed since they do not contain Obama, see #16):
+```bash
+python scripts/obama/generate_train_test_splits.py
+wc -l data/obama/filelists/{train,valid,test}.txt
+#   798 data/obama/filelists/train.txt
+#    80 data/obama/filelists/valid.txt
+#    80 data/obama/filelists/test.txt
+#   958 total
+```
 
 **Characteristics.**
 - Duration: 17 hours
