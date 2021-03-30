@@ -15,6 +15,7 @@ from tqdm import tqdm
 from constants import LEN_LIPS, LIPS_INDICES, SEED
 from data import Obama
 from scripts.obama.prepare_landmarks_espnet import (
+    CURRENT_DIR,
     ESPNET_EGS_PATH,
     get_face_landmarks_npy_path,
     write_scp,
@@ -74,9 +75,9 @@ def transform(split):
         landmarks = pca.transform(landmarks)
 
         np.save(path_o, landmarks)
-        data.append((key, path_o))
+        data.append((key, os.path.join(CURRENT_DIR, path_o)))
 
-    path = os.path.join(ESPNET_EGS_PATH, "data", split, "lips.scp")
+    path = os.path.join(ESPNET_EGS_PATH, "data", split, "lip.scp")
     write_scp(path, data)
 
 
