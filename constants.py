@@ -1,3 +1,5 @@
+SEED = 1337
+NUM_LANDMARKS = 68
 LANDMARKS_INDICES = {
     "face": (0, 17),
     "eyebrow-l": (17, 22),
