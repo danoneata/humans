@@ -17,6 +17,8 @@ import cv2
 import dlib
 import face_alignment
 
+import torch
+
 from data import DATASETS, Dataset
 from utils import make_folder
 
@@ -24,6 +26,13 @@ from utils import make_folder
 SHAPE_PREDICTOR_PATH = (
     "output/models/face-landmarks/dlib/shape_predictor_68_face_landmarks.dat"
 )
+
+FACEMESH_MODEL_PATH = (
+    "models/facemesh.pth"
+)
+
+# Indexes of FaceMeshpoints located around the lips
+CONTOUR_POINTS_LIST = [0, 11, 12, 13, 14, 15, 16, 17, 18, 37, 38, 39, 40, 41, 42, 43, 61, 62, 72, 73, 74, 76, 77, 78, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 95, 96, 106, 146, 178, 179, 180, 181, 182, 183, 184, 185, 191, 267, 268, 269, 270, 271, 272, 273, 291, 292, 302, 303, 304, 306, 307, 308, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 324, 325, 335, 375, 402, 403, 404, 405, 406, 407, 408, 409, 415]
 
 
 def shape_to_list(shape):
@@ -44,6 +53,40 @@ def detect_face_alignment_fa(fa, image):
     else:
         return []
 
+def detect_face_landmarks_facemesh(detector, net, image):
+    """ Returns the FaceMesh points located around the lip region
+        of the image. It uses the DLIB face detector to crop the
+        original image with a 25% margin around the face and
+        feeds it into the FaceMesh code. The detection is a 
+        set of 3D points. 
+        Original code and model: https://github.com/thepowerfuldeez/facemesh.pytorch
+    """
+    # The increase in the area around the face detection
+    # required by the FaceMesh net 
+    percent = 0.25 
+    # Image used by DLIB face detector
+    image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    face = detector(image_gray)[0]
+    l = face.left()
+    t = face.top()
+    w = face.right() - l
+    h = face.bottom() - t
+    # adjust top and left according to FaceMesh specs
+    t1 = t - int(percent*h)
+    l1 = l - int(percent*w)
+
+    # Crop the image around the face with a `percent` margin
+    img_o = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    crop_img = img_o[t1:t1+int((1+2*percent)*h), l1:l1+int((1+2*percent)*w)]
+    
+    # Resize the image to 192x192
+    img = cv2.resize(crop_img, (192, 192))
+    detections = net.predict_on_image(img).cpu().numpy()
+    # Return only the lip countour points normalised
+    # to the original image size
+    norm_factor = crop_img.shape[0]/192.0
+    lip_detections = detections[CONTOUR_POINTS_LIST,:]*norm_factor
+    return lip_detections.tolist()
 
 def iterate_frames(path_video):
     video_capture = cv2.VideoCapture(path_video)
@@ -112,7 +155,7 @@ def extract(dataset, detect_face_landmarks, landmark_type, key, verbose=0):
 @click.option("--n-cpu", "n_cpu", default=1, help="number of cores to use")
 @click.option("-v", "--verbose", default=0, count=True, help="how chatty to be")
 @click.option("-lt", "--landmark_type", default="dlib",
-              help="options: 1. dlib 2. face-alignment (see https://github.com/1adrianb/face-alignment)")
+              help="options: 1. dlib 2. face-alignment (see https://github.com/1adrianb/face-alignment) 3. facemesh")
 def main(dataset_name, filelist, landmark_type="dlib", n_cpu=1, verbose=0):
     dataset: Dataset = DATASETS[dataset_name]()
     keys = dataset.load_filelist(filelist)
@@ -129,6 +172,14 @@ def main(dataset_name, filelist, landmark_type="dlib", n_cpu=1, verbose=0):
         # TODO How to parallelize when running when CPU?
         fa = face_alignment.FaceAlignment(face_alignment.LandmarksType._2D, flip_input=False, device="cuda")
         detect_face_landmarks = partial(detect_face_alignment_fa, fa)
+    elif landmark_type == "facemesh":
+        from facemesh import FaceMesh
+        gpu = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        net =  FaceMesh().to(gpu)
+        net.load_weights(FACEMESH_MODEL_PATH)
+        detector = dlib.get_frontal_face_detector()
+        detect_face_landmarks = partial(detect_face_landmarks_facemesh, detector, net)
+            
     else:
         assert False, "Unknown landmark type, please use 'face_landmarks' or 'face_alignment'"
 
