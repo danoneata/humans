@@ -94,7 +94,9 @@ def extract_audio():
                 "ffmpeg",
                 "-i", src,
                 "-vn",
-                "-acodec", "copy",
+                "-ac", "1",
+                "-ar", "16000",
+                "-acodec", "pcm_s16le",
                 dst,
             ]
         )
