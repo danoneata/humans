@@ -20,6 +20,13 @@ FPS = 29.97
 EXT_VIDEO = ".mp4"
 EXT_AUDIO = ".wav"
 
+# Expected number of videos
+NUM_VIDEOS = 301
+
+# Video shots that do not contain Obama; see
+# https://gitlab.com/zevo-tech/humans/-/issues/16
+BAD_SPLITS = {"WjX0iJU3vtY-04", "WjX0iJU3vtY-06"}
+
 VideoSplit = namedtuple("VideoSplit", "name part start_frame num_frames")
 
 
