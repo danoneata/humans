@@ -75,6 +75,34 @@ def main():
 
     st.pyplot(fig3)
 
+    # get_face_landmarks_npy_pred_path = lambda key: f"/home/doneata/src/espnet/egs2/obama/exp/baseline/output/lips/{key}.npy"
+    # def get_face_landmarks_npy_true_path(key):
+    #     *key, part = key.split("-")
+    #     key = "-".join(key)
+    #     return f"output/obama/face-landmarks-npy-dlib-pca-chunks/{key}/{part}.npy"
+
+    # keys = dataset.load_filelist("chunks-test")
+    # keys = keys[:5]
+
+    # fig4, axs = plt.subplots(nrows=5, ncols=2, sharex=True, sharey=True)
+
+    # for row, key in enumerate(keys):
+    #     path_true = get_face_landmarks_npy_true_path(key)
+    #     path_pred = get_face_landmarks_npy_pred_path(key)
+
+    #     x_true = np.load(path_true)
+    #     x_pred = np.load(path_pred).squeeze(0)
+
+    #     i = len(x_true) // 2
+
+    #     x_true = pca.inverse_transform(x_true[i: i + 1])
+    #     x_pred = pca.inverse_transform(x_pred[i: i + 1])
+
+    #     draw_lips(axs[row, 0], x_true.reshape(LEN_LIPS, 2))
+    #     draw_lips(axs[row, 1], x_pred.reshape(LEN_LIPS, 2))
+
+    # st.pyplot(fig4)
+
 
 if __name__ == "__main__":
     main()
