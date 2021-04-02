@@ -19,10 +19,19 @@ from scripts.obama.pca_landmarks import (
 )
 
 
-def draw_lips(ax, landmarks):
-    kwargs = {"marker": "o"}
-    ax.plot(landmarks[0:12, 0], landmarks[0:12, 1], **kwargs)
-    ax.plot(landmarks[12:20, 0], landmarks[12:20, 1], **kwargs)
+def draw_lips(ax, landmarks, plot_kwargs=None):
+    if not plot_kwargs:
+        plot_kwargs = {"marker": "o"}
+
+    lips_inner = landmarks[:12]
+    lips_outer = landmarks[12:]
+
+    lips_inner = np.vstack((lips_inner, lips_inner[0]))
+    lips_outer = np.vstack((lips_outer, lips_outer[0]))
+
+    ax.plot(lips_inner[:, 0], lips_inner[:, 1], **plot_kwargs)
+    ax.plot(lips_outer[:, 0], lips_outer[:, 1], **plot_kwargs)
+
     # ax.set_xticklabels([])
     # ax.set_yticklabels([])
 
