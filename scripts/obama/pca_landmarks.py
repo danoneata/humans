@@ -33,6 +33,12 @@ def get_pca_path(landmarks_type):
     return os.path.join("output", "obama", "pca", "pca-" + landmarks_type + ".pkl")
 
 
+def load_pca(landmarks_type="dlib"):
+    pca_path = get_pca_path(LANDMARKS_TYPE)
+    with open(pca_path, "rb") as f:
+        return pickle.load(f)
+
+
 def fit():
     keys = DATASET.load_filelist("train")
     data = np.zeros((len(keys) * NUM_LANDMARKS_PER_VIDEO, LEN_LIPS, 2)) 
@@ -60,9 +66,7 @@ def fit():
 
 
 def transform(split):
-    pca_path = get_pca_path(LANDMARKS_TYPE)
-    with open(pca_path, "rb") as f:
-        pca = pickle.load(f)
+    pca = load_pca(LANDMARKS_TYPE)
 
     data = []  # type: List[Tuple[str, str]]
     keys = DATASET.load_filelist(split)  # type: List[str]

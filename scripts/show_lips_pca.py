@@ -12,7 +12,7 @@ import streamlit as st
 
 from constants import LEN_LIPS
 from scripts.obama.pca_landmarks import (
-    get_pca_path,
+    load_pca,
     get_face_landmarks_npy_path,
     LANDMARKS_TYPE,
     Obama,
@@ -28,9 +28,7 @@ def draw_lips(ax, landmarks):
 
 
 def main():
-    pca_path = get_pca_path(LANDMARKS_TYPE)
-    with open(pca_path, "rb") as f:
-        pca = pickle.load(f)
+    pca = load_pca()
 
     st.markdown("## PCA mean")
 
