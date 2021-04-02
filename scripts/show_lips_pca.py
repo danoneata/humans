@@ -48,6 +48,7 @@ def main():
     st.pyplot(fig1)
 
     st.markdown("## PCA components")
+    st.markdown("Showing the eight PCA components.")
 
     fig2, axs = plt.subplots(nrows=4, ncols=2, sharex=True, sharey=True)
     landmarks = pca.components_.reshape(-1, LEN_LIPS, 2)
@@ -60,6 +61,7 @@ def main():
     st.pyplot(fig2)
 
     st.markdown("## PCA reconstructions")
+    st.markdown("Inverting the PCA projection.")
 
     dataset = Obama()
 
@@ -82,6 +84,12 @@ def main():
         draw_lips(axs[row, 1], landmarks_reconstructed.reshape(LEN_LIPS, 2))
         axs[row, 2].bar(np.arange(8), coef[0])
 
+        if row == 0:
+            axs[row, 0].set_title("original")
+            axs[row, 1].set_title("reconstructed")
+            axs[row, 2].set_title("PCA coef")
+
+    fig3.tight_layout()
     st.pyplot(fig3)
 
     # get_face_landmarks_npy_pred_path = lambda key: f"/home/doneata/src/espnet/egs2/obama/exp/baseline/output/lips/{key}.npy"
