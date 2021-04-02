@@ -3,8 +3,11 @@ import os
 import pdb
 import subprocess
 
-import numpy as np
 import cv2
+import numpy as np
+import torch
+
+from torch.nn.functional import conv1d
 
 from constants import LANDMARKS_INDICES
 from data import Obama
@@ -20,6 +23,23 @@ def draw_lips(landmarks, size):
     ]
     cv2.polylines(img, poly, True, (255, 255, 255), 2)
     return img
+
+
+def smooth_temp_landmarks(landmarks):
+    landmarks = torch.tensor([landmarks_frame[0] for landmarks_frame in landmarks])
+    # landmarks = torch.squeeze(landmarks, dim=1)  # first face in each frame
+
+    landmarks = landmarks.float()
+    N, D, _ = landmarks.shape
+    w = torch.tensor([[[0.05, 0.10, 0.20, 0.30, 0.20, 0.10, 0.05]]]).float()
+    # landmarks -- num_frames, num_landmarks, 2
+    landmarks = torch.cat([landmarks[:3], landmarks, landmarks[-3:]])
+    inp = landmarks.moveaxis(0, 2).reshape(D * 2, 1, N + 6)
+    out = conv1d(inp, w)
+    out = out.reshape(D, 2, N).moveaxis(2, 0)
+    out = out.int()
+    out = torch.unsqueeze(out, dim=1)
+    return out.tolist()
 
 
 def normalize_video(dataset, key):
