@@ -92,6 +92,20 @@ def main():
     fig3.tight_layout()
     st.pyplot(fig3)
 
+    st.markdown("## Predictions")
+
+    keys = dataset.load_filelist("chunks-valid")
+    keys = keys[:5]
+
+    VIDEO_PRED_DIR = "output/obama/lips-predicted-baseline"
+
+    for key in keys:
+        st.video(os.path.join(VIDEO_PRED_DIR, key + ".mp4"))
+
+
+    st.markdown("## Un-chunked video")
+    st.video(os.path.join(VIDEO_PRED_DIR, "0tEHBVzZY4E-00.mp4"))
+
     # get_face_landmarks_npy_pred_path = lambda key: f"/home/doneata/src/espnet/egs2/obama/exp/baseline/output/lips/{key}.npy"
     # def get_face_landmarks_npy_true_path(key):
     #     *key, part = key.split("-")
