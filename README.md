@@ -207,6 +207,18 @@ obtained the alignments by using a pre-trained automatic speech recognition (ASR
 (but we can also use alignments extracted with [Gentle](https://github.com/lowerquality/gentle)).
 Faces and their landmarks were detected using the [`dlib` toolkit](http://dlib.net/).
 
+# Experimental results
+
+We report mean squared error between the lip coőrdinates of the aligned representation and the predicted data.
+Since the predictions are in the 8D PCA space, we also report the PCA reconstruction error.
+See the `evaluate.py` script.
+
+| Method                          | MSE    |
+|---------------------------------|--------|
+| PCA reconstruction              | 0.0007 |
+| baseline                        | 0.028  |
+| ... + audio encoder fine-tuning | ???    |
+
 # References
 
 - Suwajanakorn, Supasorn, Steven M. Seitz, and Ira Kemelmacher-Shlizerman. "Synthesizing Obama: learning lip sync from audio." ACM Transactions on Graphics (ToG) 36.4 (2017): 1-13. [pdf](https://grail.cs.washington.edu/projects/AudioToObama/siggraph17_obama.pdf) · [code](https://github.com/supasorn/synthesizing_obama_network_training)
