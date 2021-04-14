@@ -103,8 +103,8 @@ def main():
         st.video(os.path.join(VIDEO_PRED_DIR, key + ".mp4"))
 
 
-    st.markdown("## Un-chunked video")
-    st.video(os.path.join(VIDEO_PRED_DIR, "0tEHBVzZY4E-00.mp4"))
+    # st.markdown("## Un-chunked video")
+    # st.video(os.path.join(VIDEO_PRED_DIR, "0tEHBVzZY4E-00.mp4"))
 
     # get_face_landmarks_npy_pred_path = lambda key: f"/home/doneata/src/espnet/egs2/obama/exp/baseline/output/lips/{key}.npy"
     # def get_face_landmarks_npy_true_path(key):
