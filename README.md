@@ -209,15 +209,20 @@ Faces and their landmarks were detected using the [`dlib` toolkit](http://dlib.n
 
 # Experimental results
 
-We report mean squared error between the lip coőrdinates of the aligned representation and the predicted data.
-Since the predictions are in the 8D PCA space, we also report the PCA reconstruction error.
-See the `evaluate.py` script.
+We report mean squared error between the lip coördinates of the aligned representation and the predicted data on the validation and test splits.
+Since the predictions are in the 8D PCA space, we also report the PCA reconstruction error;
+see the `evaluate.py` script.
+Below "best" indicates using the model that yielded the best validation loss throughout the training,
+while "ave" indicates a model that averages the best ten models.
 
-| Method                          | MSE    |
-|---------------------------------|--------|
-| PCA reconstruction              | 0.0007 |
-| baseline                        | 0.028  |
-| ... + audio encoder fine-tuning | ???    |
+| method                                 | valid  | test   |
+|----------------------------------------|--------|--------|
+| PCA reconstruction                     | 0.0007 | 0.0007 |
+| baseline                               | 0.0275 | 0.0264 |
+| ... + audio encoder fine-tuning (best) | 0.0138 | 0.0138 |
+| ... + audio encoder fine-tuning (ave)  | 0.0134 | 0.0132 |
+
+Qualitative examples are available [here](https://zevo-tech.com/humans/).
 
 # References
 
