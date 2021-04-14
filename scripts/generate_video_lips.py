@@ -154,7 +154,7 @@ def generate_pred_compare(key):
         return landmarks_pred_lg
 
     landmarks_pred1_lg = load_landmarks_pred(key, "asr-ave")
-    landmarks_pred2_lg = load_landmarks_pred(key, "asr-finetune-all-best")
+    landmarks_pred2_lg = load_landmarks_pred(key, "asr-finetune-all-ave")
 
     tmp_dir = os.path.join("/tmp", key)
     os.makedirs(tmp_dir, exist_ok=True)
@@ -223,8 +223,8 @@ def main(todo):
         "41iHdxy7Kmg-00",
         "jrax-OJZrs0-00",
         "qnxYIhFfH-4-00",
-        "rnXk-uPmrz8-00",
-        "seIZB6qQEWY-00",
+        # "rnXk-uPmrz8-00",
+        # "seIZB6qQEWY-00",
     ]
     keys = [key for key in keys if get_video_name(key) in selected_video_names]
     os.makedirs(os.path.join(OUT_DIR, todo), exist_ok=True)

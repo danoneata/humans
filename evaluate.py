@@ -20,6 +20,7 @@ def split_key(key):
 MODEL_DIR = {
     "asr-ave": "baseline/asr/output-{}",
     "asr-finetune-all-best": "baseline/asr-finetune-all/output-{}-best",
+    "asr-finetune-all-ave": "baseline/asr-finetune-all/output-{}-ave",
 }
 
 
