@@ -118,8 +118,50 @@ class Obama(Dataset):
         return os.path.join(self.folder_face_landmarks, landmark_type, key + ".json")
 
 
+class LRS3(Dataset):
+    """Lip Reading Sentences 3: a dataset based on TED and TEDx videos.
+
+    https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html
+
+    """
+
+    name = "lrs3"
+    base_path = "data/lrs3"
+    base_path_nas = "/mnt/private-share/speechDatabases/lrs3"
+    video_ext = "mp4"
+    fps = 25
+
+    def load_filelist(self, filelist):
+        """The keys defined in the filelist are tuples of the type
+        video name, part number, split; for example:
+
+        """
+        path = os.path.join(self.base_path, "filelists", filelist + ".txt")
+        with open(path, "r") as f:
+            return [line.strip().split() for line in f.readlines()]
+
+    def get_video_path(self, key):
+        video, part, split = key
+        return os.path.join(self.base_path_nas, split, video, part + "." + self.video_ext)
+
+    def get_audio_path(self, key):
+        audio_ext = "wav"
+        video, part, _ = key
+        return os.path.join(self.base_path, "audio", video + "-" + part + "." + audio_ext)
+
+    def get_face_landmarks_path(self, key, landmark_type="dlib"):
+        video, part, _ = key
+        return os.path.join(self.base_path, "face-landmarks", landmark_type, video + "-" + part + ".json")
+
+    def key_to_str(self, key: Key) -> str:
+        """Overload if you want to pretty print structured keys."""
+        video, part, _ = key
+        return video + "-" + part
+
+
 DATASETS = {
     "grid": GRID,
     # TODO Parameterize dataset by video size.
     "obama-360p": Obama,
+    "lrs3": LRS3,
 }
