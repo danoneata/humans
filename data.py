@@ -24,7 +24,7 @@ class Dataset(metaclass=ABCMeta):
 
     def key_to_str(self, key: Key) -> str:
         """Overload if you want to pretty print structured keys."""
-        return str(Key)
+        return str(key)
 
 
 class GRID(Dataset):
