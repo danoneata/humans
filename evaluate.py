@@ -3,11 +3,15 @@ import os
 
 import click
 
+from functools import partial
+
+from typing import Any, Callable
+
 import numpy as np
 
 from sklearn.metrics import mean_squared_error  # type: ignore
 
-from data import Obama
+from data import DATASETS, Dataset
 from scripts.obama.pca_landmarks import load_pca
 
 
@@ -18,30 +22,51 @@ def split_key(key):
 
 
 MODEL_DIR = {
-    "asr-ave": "baseline/asr/output-{}",
-    "asr-finetune-all-best": "baseline/asr-finetune-all/output-{}-best",
-    "asr-finetune-all-ave": "baseline/asr-finetune-all/output-{}-ave",
+    "obama": {
+        "asr-ave": "baseline/asr/output-{}",
+        "asr-finetune-all-best": "baseline/asr-finetune-all/output-{}-best",
+        "asr-finetune-all-ave": "baseline/asr-finetune-all/output-{}-ave",
+    },
+    "lrs3": {
+        "asr-ave": "baseline/asr/output-lrs3-{}-ave",
+        "asr-finetune-all-ave": "baseline/asr-finetune-all/output-lrs3-{}-ave",
+    },
+}
+
+
+FILELISTS = {
+    "obama": lambda split: "chunks-" + split,
+    "lrs3": lambda split: split,
+}
+
+
+FACE_LANDMARKS_DIR = {
+    "obama": lambda key, use_pca: "output/obama/face-landmarks-npy-dlib{}-chunks/{}/{}.npy".format("-pca" if use_pca else "", *split_key(key)),
+    "lrs3": lambda key, use_pca: "output/lrs3/face-landmarks-npy-dlib{}/{}.npy".format("-pca" if use_pca else "", key)
 }
 
 
 @click.command()
-@click.option("-m", "--model", type=click.Choice(MODEL_DIR))
+@click.option("-d", "--dataset", "dataset_name", type=click.Choice(DATASETS))
+@click.option("-m", "--model", type=click.Choice(MODEL_DIR["obama"]))
 @click.option("-s", "--split", type=click.Choice(["valid", "test"]))
-def main(model="asr-ave", split="test"):
+def main(dataset_name, model="asr-ave", split="test"):
     pca = load_pca()
-    dataset = Obama()
+    dataset = DATASETS[dataset_name]()  # type: Dataset
 
-    keys = dataset.load_filelist("chunks-" + split)
-
-    get_path_true_lg = lambda key: "output/obama/face-landmarks-npy-dlib-chunks/{}/{}.npy".format(*split_key(key))
-    get_path_true_sm = lambda key: "output/obama/face-landmarks-npy-dlib-pca-chunks/{}/{}.npy".format(*split_key(key))
+    get_path_true_lg = partial(FACE_LANDMARKS_DIR[dataset_name], use_pca=False)  # type: Callable[[Any], Any]
+    get_path_true_sm = partial(FACE_LANDMARKS_DIR[dataset_name], use_pca=True)  # type: Callable[[Any], Any]
     get_path_pred_sm = lambda key: os.path.join(
         "/home/doneata/src/espnet/egs2/obama/exp",
-        MODEL_DIR[model].format(split),
+        MODEL_DIR[dataset_name][model].format(split),
         "lips",
         key + ".npy",
     )
- 
+
+    filelist_name = FILELISTS[dataset_name](split)
+    keys = [dataset.key_to_str(key) for key in dataset.load_filelist(filelist_name)]
+    keys = [key for key in keys if os.path.exists(get_path_true_sm(key))]
+
     y_true_lg = [np.load(get_path_true_lg(key)) for key in keys]
     y_true_sm = [np.load(get_path_true_sm(key)) for key in keys]
     y_pred_sm = [np.load(get_path_pred_sm(key)).squeeze() for key in keys]

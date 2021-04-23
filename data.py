@@ -2,7 +2,7 @@ import os
 
 from abc import ABCMeta, abstractmethod
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Type
 
 # Type aliases, mostly for readability purposes
 Path = str
@@ -164,4 +164,4 @@ DATASETS = {
     # TODO Parameterize dataset by video size.
     "obama-360p": Obama,
     "lrs3": LRS3,
-}
+}  # type: Dict[str, Type[Dataset]]

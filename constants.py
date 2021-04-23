@@ -1,3 +1,5 @@
+from typing_extensions import Literal
+
 SEED = 1337
 NUM_LANDMARKS = 68
 LANDMARKS_INDICES = {
@@ -14,3 +16,5 @@ LANDMARKS_INDICES = {
 # Indices for lips and teeth
 LIPS_INDICES = (48, 68)
 LEN_LIPS = LIPS_INDICES[1] - LIPS_INDICES[0]
+
+Landmark = Literal["dlib", "face-alignment", "facemesh"]

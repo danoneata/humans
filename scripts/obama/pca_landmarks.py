@@ -12,12 +12,12 @@ from sklearn.decomposition import PCA  # type: ignore
 
 from tqdm import tqdm
 
-from constants import LEN_LIPS, LIPS_INDICES, SEED
+from constants import LEN_LIPS, LIPS_INDICES, SEED, Landmark
 from data import Obama
+from face_normalization import get_face_landmarks_npy_path
 from scripts.obama.prepare_landmarks_espnet import (
     CURRENT_DIR,
     ESPNET_EGS_PATH,
-    get_face_landmarks_npy_path,
     write_scp,
 )
 from utils import make_folder
@@ -26,7 +26,7 @@ from utils import make_folder
 np.random.seed(SEED)
 NUM_LANDMARKS_PER_VIDEO = 128
 DATASET = Obama()
-LANDMARKS_TYPE = "dlib"
+LANDMARKS_TYPE = "dlib"  # type: Landmark
 
 
 def get_pca_path(landmarks_type):
@@ -44,7 +44,7 @@ def fit():
     data = np.zeros((len(keys) * NUM_LANDMARKS_PER_VIDEO, LEN_LIPS, 2)) 
 
     for i, key in enumerate(keys):
-        path = get_face_landmarks_npy_path("dlib", key)
+        path = get_face_landmarks_npy_path(DATASET, "dlib", key)
         landmarks = np.load(path)
 
         idxs = np.random.choice(len(landmarks), size=NUM_LANDMARKS_PER_VIDEO)
@@ -72,8 +72,8 @@ def transform(split):
     keys = DATASET.load_filelist(split)  # type: List[str]
 
     for key in tqdm(keys):
-        path_i = get_face_landmarks_npy_path(LANDMARKS_TYPE, key)
-        path_o = get_face_landmarks_npy_path(LANDMARKS_TYPE, key, use_pca=True)
+        path_i = get_face_landmarks_npy_path(DATASET, LANDMARKS_TYPE, key)
+        path_o = get_face_landmarks_npy_path(DATASET, LANDMARKS_TYPE, key, use_pca=True)
 
         landmarks = np.load(path_i)
         landmarks = pca.transform(landmarks)
