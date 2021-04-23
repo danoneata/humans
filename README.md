@@ -89,6 +89,20 @@ Obtained with the following command:
 /bin/ls -1 data/obama/video/ | parallel ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 data/obama/video/{} | sort | uniq -c
 ```
 
+## LRS3
+
+**Data preparation.**
+Using this dataset for evaluation only; so we are using only it's test split.
+1. Data is downloaded from [here](https://www.robots.ox.ac.uk/~vgg/data/lip_reading/lrs3.html).
+2. Prepare filelists:
+```bash
+find /mnt/private-share/speechDatabases/lrs3/test/ -name '*.mp4' | tr '/' ' ' | cut -f1 -d'.' | awk '{print $6, $7, $5}' | sort > data/lrs3/filelists/test.txt
+```
+
+**Characteristics.**
+- Frames per second: 25
+- Video resolution: 224 × 244; all videos have the face cropped and the same resolution.
+
 # Main functionality
 
 Extract face landmarks:
