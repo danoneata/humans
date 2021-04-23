@@ -142,16 +142,25 @@ class LRS3(Dataset):
 
     def get_video_path(self, key):
         video, part, split = key
-        return os.path.join(self.base_path_nas, split, video, part + "." + self.video_ext)
+        return os.path.join(
+            self.base_path_nas, split, video, part + "." + self.video_ext
+        )
 
     def get_audio_path(self, key):
         audio_ext = "wav"
         video, part, _ = key
-        return os.path.join(self.base_path, "audio", video + "-" + part + "." + audio_ext)
+        return os.path.join(
+            self.base_path, "audio", video + "-" + part + "." + audio_ext
+        )
 
     def get_face_landmarks_path(self, key, landmark_type="dlib"):
         video, part, _ = key
-        return os.path.join(self.base_path, "face-landmarks", landmark_type, video + "-" + part + ".json")
+        return os.path.join(
+            self.base_path,
+            "face-landmarks",
+            landmark_type,
+            video + "-" + part + ".json",
+        )
 
     def key_to_str(self, key: Key) -> str:
         """Overload if you want to pretty print structured keys."""
@@ -159,9 +168,30 @@ class LRS3(Dataset):
         return video + "-" + part
 
 
+class ObamaTTS(Dataset):
+    name = "obama-tts"
+    audio_ext = "wav"
+    base_path = "data/obama-tts"
+    fps = 29.97
+
+    def load_filelist(self, name=None):
+        return ["out_synth_{:03d}".format(i) for i in range(11)]
+
+    def get_video_path(self, key):
+        assert False
+
+    def get_audio_path(self, key):
+        audio_ext = "wav"
+        return os.path.join(self.base_path, "audio", key + "." + audio_ext)
+
+    def get_face_landmarks_path(self, key, landmark_type="dlib"):
+        assert False
+
+
 DATASETS = {
     "grid": GRID,
     # TODO Parameterize dataset by video size.
     "obama-360p": Obama,
     "lrs3": LRS3,
+    "obama-tts": ObamaTTS,
 }  # type: Dict[str, Type[Dataset]]
