@@ -103,6 +103,21 @@ find /mnt/private-share/speechDatabases/lrs3/test/ -name '*.mp4' | tr '/' ' ' | 
 - Frames per second: 25
 - Video resolution: 224 × 244; all videos have the face cropped and the same resolution.
 
+## Obama TTS
+
+... Obama's synthesized voice; samples obtain from Adriana's TTS system.
+Here are the steps used for preparing the data, predicting and preparing the output.
+
+```bash
+python scripts/obama_tts/process_data.py -t resample-audio
+python scripts/obama_tts/process_data.py -t prepare-espnet-filelists
+# inference; at ~/src/espnet/egs2/obama
+bash inference.sh --asr_type asr --model_type ave --dset obama-tts
+# prepare videos and webpage
+python scripts/obama_tts/generate_video_lips.py -t pred-compare
+python scripts/obama_tts/www_results.py
+```
+
 # Main functionality
 
 Extract face landmarks:
