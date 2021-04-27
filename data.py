@@ -174,18 +174,43 @@ class ObamaTTS(Dataset):
     base_path = "data/obama-tts"
     fps = 29.97
 
-    def load_filelist(self, name=None):
+    def load_filelist(self, name=""):
         return ["out_synth_{:03d}".format(i) for i in range(11)]
 
     def get_video_path(self, key):
         assert False
 
     def get_audio_path(self, key):
-        audio_ext = "wav"
-        return os.path.join(self.base_path, "audio", key + "." + audio_ext)
+        return os.path.join(self.base_path, "audio", key + "." + self.audio_ext)
 
     def get_face_landmarks_path(self, key, landmark_type="dlib"):
         assert False
+
+
+class Diego(Dataset):
+    audio_ext = "wav"
+    video_ext = "mp4"
+    base_path = "data/diego"
+    fps = 29.97
+
+    def __init__(self, video_res):
+        self.video_res = video_res
+        self.name = "diego-" + video_res
+
+    def load_filelist(self, name=""):
+        return "talking1 talking2 head_poses lips".split()
+
+    def get_video_orig_path(self, key):
+        return os.path.join(self.base_path, "video-orig", key + "." + self.video_ext)
+
+    def get_video_path(self, key):
+        return os.path.join(self.base_path, "video-" + self.video_res, key + "." + self.video_ext)
+
+    def get_audio_path(self, key):
+        return os.path.join(self.base_path, "audio", key + "." + self.audio_ext)
+
+    def get_face_landmarks_path(self, key, landmark_type="dlib"):
+        return os.path.join(self.base_path, "face-landmarks-" + self.video_res, key + ".json")
 
 
 DATASETS = {
@@ -194,4 +219,6 @@ DATASETS = {
     "obama-360p": Obama,
     "lrs3": LRS3,
     "obama-tts": ObamaTTS,
-}  # type: Dict[str, Type[Dataset]]
+    "diego-360p": lambda: Diego(video_res="360p"),
+    "diego-1080p": lambda: Diego(video_res="1080p"),
+}
