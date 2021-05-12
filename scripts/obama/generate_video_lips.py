@@ -19,7 +19,6 @@ from scripts.show_lips_pca import draw_lips
 
 
 
-SPLIT = "valid"
 OUT_DIR = "output/obama/lips-predicted-baseline"
 get_path_true = lambda key: "output/obama/face-landmarks-npy-dlib-chunks/{}/{}.npy".format(*split_key(key))
 get_path_audio = lambda key: "output/obama/audio-chunks/{}/{}.wav".format(*split_key(key))
@@ -205,28 +204,111 @@ def generate_pred_compare(key):
     shutil.rmtree(tmp_dir)
 
 
+def generate_pred_compare_subsample(key):
+    pca = load_pca()
+    R = [1, 2, 4, 8, 16, 32]
+
+    landmarks_true_org = np.load(get_path_true(key))
+    landmarks_true_rec = pca.inverse_transform(pca.transform(landmarks_true_org))
+
+    # reshape
+    landmarks_true_org = landmarks_true_org.reshape(-1, LEN_LIPS, 2)
+    landmarks_true_rec = landmarks_true_rec.reshape(-1, LEN_LIPS, 2)
+
+    def get_path_pred(key, r, n):
+        base_path = "/home/doneata/src/espnet/egs2/obama/exp"
+        if r > 1:
+            d = f"baseline-subsample/reciprocal-{r:02d}-num-{n:d}/asr"
+        else:
+            d = f"baseline/asr-finetune-all"
+        return os.path.join(base_path, d, "output-test-ave", "lips", key + ".npy")
+
+    def load_landmarks_pred(key, r, n):
+        landmarks_pred_sm = np.load(get_path_pred(key, r, n))
+        landmarks_pred_sm = landmarks_pred_sm.squeeze(0)
+        landmarks_pred_lg = pca.inverse_transform(landmarks_pred_sm)
+        landmarks_pred_lg = landmarks_pred_lg.reshape(-1, LEN_LIPS, 2)
+        return landmarks_pred_lg
+
+    landmarks_pred_all = {r: load_landmarks_pred(key, r, 0) for r in R}
+
+    tmp_dir = os.path.join("/tmp", key)
+    os.makedirs(tmp_dir, exist_ok=True)
+
+    num_frames = len(landmarks_true_org)
+
+    for i in enumerate(tqdm(range(num_frames))):
+        fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(8.5, 2))
+
+        for r in R:
+            row = r // 3
+            col = r % 3
+
+            draw_lips(axs[row, col], landmarks_pred_all[r][i], dict(marker="o", color="orange"))
+            draw_lips(axs[row, col], landmarks_true_rec[i], dict(marker="o", color="blue"))
+            axs[row, col].set_title(f"r = {r}")
+
+            ax[row, col].set_xlim(-2.5, 2.5)
+            ax[row, col].set_ylim(-2.0, 2.0)
+            ax[row, col].set_axis_off()
+
+        path = os.path.join(tmp_dir, f"{i:05d}.png")
+
+        plt.tight_layout()
+        plt.savefig(path)
+        plt.close(fig)
+
+    video_path = os.path.join(OUT_DIR, "pred-compare-subsample", key + ".mp4")
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-r", "29.97",
+            "-i", os.path.join(tmp_dir, "%05d.png"),
+            "-i", get_path_audio(key),
+            "-y",
+            "-c:v", "libx264",
+            # "-vf", "fps=29.97",
+            "-pix_fmt", "yuv420p",
+            "-c:a", "aac",
+            "-shortest",
+            video_path,
+        ]
+    )
+
+    shutil.rmtree(tmp_dir)
+
+
+
 TODO = {
     "true-long": generate_true_long,
     "pred-vs-true": generate_pred_vs_true,
     "pred-compare": generate_pred_compare,
+    "pred-compare-subsample": generate_pred_compare_subsample,
 }
 
 
 @click.command()
 @click.option("-t", "--todo", type=click.Choice(TODO.keys()))
-def main(todo):
+@click.option("-s", "--split", type=click.Choice(["valid", "test"]), required=True)
+def main(todo, split):
     get_video_name = lambda key: key[:14]
     dataset = Obama()
-    keys = dataset.load_filelist("chunks-" + SPLIT)
+    keys = dataset.load_filelist("chunks-" + split)
     video_names = sorted(list(set(map(get_video_name, keys))))
-    selected_video_names = [
-        "41iHdxy7Kmg-00",
-        "jrax-OJZrs0-00",
-        "qnxYIhFfH-4-00",
-        # "rnXk-uPmrz8-00",
-        # "seIZB6qQEWY-00",
-    ]
-    keys = [key for key in keys if get_video_name(key) in selected_video_names]
+    selected_video_names = {
+        "valid": {
+            "41iHdxy7Kmg-00",
+            "jrax-OJZrs0-00",
+            "qnxYIhFfH-4-00",
+            # "rnXk-uPmrz8-00",
+            # "seIZB6qQEWY-00",
+        },
+        "test": {
+            "GpdoHwhhCf0-00",
+            "0bB0Cv4Oz0I-01",
+        },
+    }
+    keys = [key for key in keys if get_video_name(key) in selected_video_names[split]]
     os.makedirs(os.path.join(OUT_DIR, todo), exist_ok=True)
     for key in keys:
         TODO[todo](key)
