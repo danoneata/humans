@@ -27,6 +27,9 @@ MODEL_DIR = {
         "asr-finetune-all-best": "baseline/asr-finetune-all/output-{}-best",
         "asr-finetune-all-ave": "baseline/asr-finetune-all/output-{}-ave",
     },
+    "trump-360p": {
+        "asr-finetune-all-ave": "baseline/asr-finetune-all/output-trump-chunks-{}-ave",
+    },
     "lrs3": {
         "asr-ave": "baseline/asr/output-lrs3-{}-ave",
         "asr-finetune-all-ave": "baseline/asr-finetune-all/output-lrs3-{}-ave",
@@ -42,12 +45,14 @@ for r in [2, 4, 8, 16, 32, 64]:
 
 FILELISTS = {
     "obama-360p": lambda split: "chunks-" + split,
+    "trump-360p": lambda split: "chunks-" + split,
     "lrs3": lambda split: split,
 }
 
 
 FACE_LANDMARKS_DIR = {
     "obama-360p": lambda key, use_pca: "output/obama/face-landmarks-npy-dlib{}-chunks/{}/{}.npy".format("-pca" if use_pca else "", *split_key(key)),
+    "trump-360p": lambda key, use_pca: "output/trump/face-landmarks-npy-dlib{}-chunks/{}/{}.npy".format("-pca" if use_pca else "", *split_key(key)),
     "lrs3": lambda key, use_pca: "output/lrs3/face-landmarks-npy-dlib{}/{}.npy".format("-pca" if use_pca else "", key)
 }
 
