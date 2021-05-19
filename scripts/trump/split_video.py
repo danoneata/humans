@@ -30,28 +30,33 @@ def cache(func, path, *args, **kwargs):
 
 
 def get_color_histograms(path_video):
-    return np.vstack([
-        np.hstack([
-            np.histogram(frame[:, :, i].ravel(), 256, [0, 256], density=True)[0]
-            for i in [0, 1, 2]
-        ])
-        for frame in iterate_frames(path_video)
-    ])
+    return np.vstack(
+        [
+            np.hstack(
+                [
+                    np.histogram(frame[:, :, i].ravel(), 256, [0, 256], density=True)[0]
+                    for i in [0, 1, 2]
+                ]
+            )
+            for frame in iterate_frames(path_video)
+        ]
+    )
 
 
-def get_frame_ranges(histograms, τ):
+def get_frame_ranges(histograms, τ, to_show=False):
     R = 19 * 60 * FPS  # reference frame
     dists = np.mean((histograms - histograms[R]) ** 2, axis=1)
 
-    # fig, ax = plt.subplots()
-    # ax.hist(dists, bins=30)
-    # st.pyplot(fig)
+    if to_show:
+        fig, ax = plt.subplots()
+        ax.hist(dists, bins=30)
+        st.pyplot(fig)
 
-    # fig, ax = plt.subplots()
-    # ax.plot(np.arange(len(is_trump)), is_trump)
-    # st.pyplot(fig)
+        fig, ax = plt.subplots()
+        ax.plot(np.arange(len(is_trump)), is_trump)
+        st.pyplot(fig)
 
-    is_trump_idxs, = np.where(dists < τ)
+    (is_trump_idxs,) = np.where(dists < τ)
     groups = groupby(enumerate(is_trump_idxs), lambda ix: ix[0] - ix[1])
     groups = (list(map(second, g)) for k, g in groups)
 
@@ -61,16 +66,8 @@ def get_frame_ranges(histograms, τ):
     return list(ranges)
 
 
-@click.command()
-@click.option("-k", "--key")
-def main(key):
-    path_video = os.path.join("data/trump/video-360p", key + ".mp4")
-    path_hists = f"output/trump/video-360p/color-histograms-{key}.npy" 
-    path_ranges = f"output/trump/video-360p/frame-ranges-{key}-{τ}.npy" 
-
-    histograms = cache(get_color_histograms, path_hists, path_video)
-    ranges = cache(get_frame_ranges, path_ranges, histograms, τ)
-    
+def split_videos(key, ranges, to_show):
+    path_video = f"data/trump/video-360p/{key}.mp4"
     for i, (α, ω) in enumerate(ranges):
         start = α / FPS
         duration = (ω - α) / FPS
@@ -95,7 +92,46 @@ def main(key):
             )
             # fmt: on
 
-        st.video(dst)
+        if to_show:
+            st.video(dst)
+
+
+def extract_audio(key, ranges):
+    for i, _ in enumerate(ranges):
+        src = f"data/trump/video-split-360p/{key}-{i:03d}.mp4"
+        dst = f"data/trump/audio-split/{key}-{i:03d}.wav"
+
+        if os.path.exists(dst):
+            continue
+
+        # fmt: off
+        subprocess.run(
+            [
+                "ffmpeg",
+                "-i", src,
+                "-vn",
+                "-ac", "1",
+                "-ar", "16000",
+                "-acodec", "pcm_s16le",
+                dst,
+            ]
+        )
+        # fmt: on
+
+
+@click.command()
+@click.option("-k", "--key", required=True)
+@click.option("--to-show", "to_show")
+def main(key, to_show=False):
+    path_video = f"data/trump/video-360p/{key}.mp4"
+    path_hists = f"output/trump/video-360p/color-histograms-{key}.npy"
+    path_ranges = f"output/trump/video-360p/frame-ranges-{key}-{τ}.npy"
+
+    histograms = cache(get_color_histograms, path_hists, path_video)
+    ranges = cache(get_frame_ranges, path_ranges, histograms, τ, to_show)
+    split_videos(key, ranges, to_show)
+    extract_audio(key, ranges)
+    # python scripts/extract_face_landmarks.py --dataset trump-360p --filelist full --n-cpu 4 -v
 
 
 if __name__ == "__main__":
