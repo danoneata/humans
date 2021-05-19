@@ -30,10 +30,7 @@ from utils import make_folder
 # chunk characteristics
 DURATION = 10_000  # ms
 OVERLAP = 1_000  # ms
-
 LANDMARKS_TYPE = "dlib"
-USE_PCA = True
-SUFFIX = "-pca" if USE_PCA else ""
 
 
 def split_wav(dataset, key, verbose=0):
@@ -74,13 +71,14 @@ def split_wav(dataset, key, verbose=0):
     return data_scp
 
 
-def split_lip(dataset, key, verbose):
-    path_i = get_face_landmarks_npy_path(dataset, LANDMARKS_TYPE, key, USE_PCA)
+def split_lip(dataset, key, verbose, use_pca=True):
+    path_i = get_face_landmarks_npy_path(dataset, LANDMARKS_TYPE, key, use_pca)
+    suffix = "-pca" if use_pca else ""
     get_path_o = lambda key, i: os.path.join(
         CURRENT_DIR,
         "output",
         dataset.name,
-        "face-landmarks-npy-" + LANDMARKS_TYPE + SUFFIX + "-chunks",
+        "face-landmarks-npy-" + LANDMARKS_TYPE + suffix + "-chunks",
         key,
         f"{i:03d}.npy",
     )
@@ -140,6 +138,8 @@ def split_lip(dataset, key, verbose):
 def main(dataset_name, split, verbose):
     dataset = DATASETS[dataset_name]()
     keys = dataset.load_filelist(split)
+
+    _ = list(concat([split_lip(dataset, key, verbose, use_pca=False) for key in keys]))
 
     data_wav_scp = list(concat([split_wav(dataset, key, verbose) for key in keys]))
     data_lip_scp = list(concat([split_lip(dataset, key, verbose) for key in keys]))
