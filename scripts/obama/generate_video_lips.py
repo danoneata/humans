@@ -205,6 +205,10 @@ def generate_pred_compare(key):
 
 
 def generate_pred_compare_subsample(key):
+    # video_path = os.path.join(OUT_DIR, "pred-compare-subsample", key + ".mp4")
+    # if os.path.exists(video_path):
+    #     return
+
     pca = load_pca()
     R = [1, 2, 4, 8, 16, 32]
 
@@ -237,20 +241,23 @@ def generate_pred_compare_subsample(key):
 
     num_frames = len(landmarks_true_org)
 
-    for i in enumerate(tqdm(range(num_frames))):
-        fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(8.5, 2))
+    for i in tqdm(range(num_frames)):
+        fig, axs = plt.subplots(nrows=2, ncols=3, figsize=(6.5, 4.5))
 
-        for r in R:
-            row = r // 3
-            col = r % 3
+        for j, r in enumerate(R):
+            row = j // 3
+            col = j % 3
 
-            draw_lips(axs[row, col], landmarks_pred_all[r][i], dict(marker="o", color="orange"))
-            draw_lips(axs[row, col], landmarks_true_rec[i], dict(marker="o", color="blue"))
+            try:
+                draw_lips(axs[row, col], landmarks_true_rec[i], dict(marker="o", color="blue"))
+                draw_lips(axs[row, col], landmarks_pred_all[r][i], dict(marker="o", color="orange"))
+            except IndexError:
+                break
+
             axs[row, col].set_title(f"r = {r}")
-
-            ax[row, col].set_xlim(-2.5, 2.5)
-            ax[row, col].set_ylim(-2.0, 2.0)
-            ax[row, col].set_axis_off()
+            axs[row, col].set_xlim(-2.5, 2.5)
+            axs[row, col].set_ylim(-2.0, 2.0)
+            axs[row, col].set_axis_off()
 
         path = os.path.join(tmp_dir, f"{i:05d}.png")
 
