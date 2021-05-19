@@ -213,6 +213,34 @@ class Diego(Dataset):
         return os.path.join(self.base_path, "face-landmarks-" + self.video_res, key + ".json")
 
 
+class Trump(Dataset):
+    audio_ext = "wav"
+    video_ext = "mp4"
+    base_path = "data/trump"
+    fps = 30.00
+
+    def __init__(self, video_res):
+        self.video_res = video_res
+        self.name = "trump-" + video_res
+
+    def load_filelist(self, filelist):
+        path = os.path.join(self.base_path, "filelists", filelist + ".txt")
+        with open(path, "r") as f:
+            return [line.strip() for line in f.readlines()]
+
+    def get_video_orig_path(self, key):
+        return os.path.join(self.base_path, "video-orig", key + "." + self.video_ext)
+
+    def get_video_path(self, key):
+        return os.path.join(self.base_path, "video-" + self.video_res, key + "." + self.video_ext)
+
+    def get_audio_path(self, key):
+        return os.path.join(self.base_path, "audio", key + "." + self.audio_ext)
+
+    def get_face_landmarks_path(self, key, landmark_type="dlib"):
+        return os.path.join(self.base_path, "face-landmarks-" + self.video_res, key + ".json")
+
+
 DATASETS = {
     "grid": GRID,
     # TODO Parameterize dataset by video size.
@@ -221,4 +249,5 @@ DATASETS = {
     "obama-tts": ObamaTTS,
     "diego-360p": lambda: Diego(video_res="360p"),
     "diego-1080p": lambda: Diego(video_res="1080p"),
+    "trump-360p": lambda: Trump(video_res="360p"),
 }
