@@ -94,6 +94,8 @@ class Obama(Dataset):
     name = "obama"
     base_path = "data/obama"
     video_ext = "mp4"
+    audio_ext = "wav"
+    fps = 29.97
 
     folder_video = os.path.join(base_path, "video-split-360p")
     # Path to face landmarks extracted by Cristi using `dlib`.
@@ -103,6 +105,9 @@ class Obama(Dataset):
         path = os.path.join(self.base_path, "filelists", filelist + ".txt")
         with open(path, "r") as f:
             return [line.strip() for line in f.readlines()]
+
+    def get_audio_path(self, key):
+        return os.path.join(self.base_path, "audio-split", key + "." + self.audio_ext)
 
     # def load_filelist_json(self, filelist):
     #     path = os.path.join(self.base_path, "filelists", filelist + ".json")
