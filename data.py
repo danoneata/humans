@@ -226,7 +226,7 @@ class Trump(Dataset):
 
     def __init__(self, video_res):
         self.video_res = video_res
-        self.name = "trump-" + video_res
+        self.name = "trump"
 
     def load_filelist(self, filelist):
         path = os.path.join(self.base_path, "filelists", filelist + ".txt")
@@ -237,10 +237,10 @@ class Trump(Dataset):
         return os.path.join(self.base_path, "video-orig", key + "." + self.video_ext)
 
     def get_video_path(self, key):
-        return os.path.join(self.base_path, "video-" + self.video_res, key + "." + self.video_ext)
+        return os.path.join(self.base_path, "video-split-" + self.video_res, key + "." + self.video_ext)
 
     def get_audio_path(self, key):
-        return os.path.join(self.base_path, "audio", key + "." + self.audio_ext)
+        return os.path.join(self.base_path, "audio-split", key + "." + self.audio_ext)
 
     def get_face_landmarks_path(self, key, landmark_type="dlib"):
         return os.path.join(self.base_path, "face-landmarks-" + self.video_res, key + ".json")
