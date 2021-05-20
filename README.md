@@ -33,6 +33,50 @@ The base path for models is
 ls /home/doneata/work/humans/output/models
 ```
 
+## Setup the audio-to-lip network
+
+Here are the steps on how to run an inference using the audio-to-lip network:
+
+1. Clone my fork of ESPnet and use the branch with the `audio-to-lip` implementation:
+```bash
+git clone https://github.com/danoneata/espnet
+cd espnet && git checkout audio-to-lip
+```
+2. [Install ESPnet and its dependencies](https://espnet.github.io/espnet/installation.html) (follow only step 2, as there is no need for Kaldi).
+3. Download the Obama models:
+```bash
+wget https://zevo-tech.com/humans/data/espnet-models-obama.zip
+cd egs2/obama && unzip espnet-models-obama.zip
+```
+4. Prepare the list of audio files to be processed for the desired dataset in `data/my-dataset/wav.scp`;
+note that the wav audio files are expected to be sampled at 16 KHz and single channel.
+As an example, you can download the sample data—a tiny, ten-files subset of the Obama dataset.
+```bash
+wget https://zevo-tech.com/humans/data/espnet-sample-data.zip
+cd egs2/obama && unzip espnet-sample-data
+head -n3 data/obama-tiny/wav.scp
+# 0_9ue3Tx8Jk-00-000 data/obama-tiny/audio/0_9ue3Tx8Jk-00/000.wav
+# 0_9ue3Tx8Jk-00-001 data/obama-tiny/audio/0_9ue3Tx8Jk-00/001.wav
+# 0_9ue3Tx8Jk-00-002 data/obama-tiny/audio/0_9ue3Tx8Jk-00/002.wav
+```
+5. Run the audio-to-lip inference:
+```bash
+bash inference.sh --asr_type asr-finetune-all --model_type ave --dset obama-tts --fps 29.97
+```
+6. The predicted lips will be located at `exp/baseline/asr-finetune-all/output-obama-tiny-ave/lips`.
+These are 8D vectors (for each frame);
+in order to upsample them to the original 2 × 20 dimensions, you can use the PCA model; to visualize the results, please check the script `generate_video_lips.py` from the current repository:
+```bash
+wget https://zevo-tech.com/humans/data/pca-obama-dlib.pkl
+# E is the path to the ESPnet recipe
+# E=~/src/espnet/egs2/obama
+python scripts/generate_video_lips.py \
+    -l $E/exp/baseline/asr-finetune-all/output-obama-tiny-ave/lips/0_9ue3Tx8Jk-00-000.npy \
+    -a $E/data/obama-tiny/audio/0_9ue3Tx8Jk-00/000.wav \
+    -p pca-obama-dlib.pkl \
+    -o 0_9ue3Tx8Jk-00-000.mp4
+```
+
 # Datasets
 
 ## Obama's weekly addresses
