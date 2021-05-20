@@ -162,6 +162,47 @@ python scripts/obama_tts/generate_video_lips.py -t pred-compare
 python scripts/obama_tts/www_results.py
 ```
 
+## Diego
+
+```bash
+python scripts/diego/process_data.py --todo resize-video
+python scripts/extract_face_landmarks.py -d diego-360p --n-cpu 4 -lt dlib
+```
+
+Data is available [here](https://zevo-tech.com/humans/data/diego-face-landmarks.zip).
+
+## Trump
+
+This dataset was created from Donald Trump's [recent speech at Conservative Political Action Conference (CPAC)](https://www.youtube.com/watch?v=KJTlo4bQL5c).
+Since there are shot changes and interruptions, we selected only those frames that were similar (in terms of color distribution) to a reference frame (selected with Trump in close view).
+We had obtained 34 video shots totalling almost an hour of speech (57.43 minutes).
+From these, we have randomly picked 3 videos shots for testing and 3 for validation.
+The dataset is challenging since there is still significant head pose variation and background noise (applauses and cheering).
+
+Here are the main pre-processing steps:
+- Download video:
+```bash
+bash script/local/prepare_data.sh
+```
+- Splits were defined as follows:
+```bash
+shuf data/trump/filelists/full.txt | head -n3 | sort > data/trump/filelists/test.txt
+comm -13 data/trump/filelists/{test,full}.txt | shuf | head -n3 > data/trump/filelists/valid.txt
+comm -13 <(cat data/trump/filelists/{test,valid}.txt | sort) data/trump/filelists/full.txt > data/trump/filelists/train.txt
+```
+- Find shots with Trump by keeping those frames closest (in terms of color histogram) to a reference frame.
+- There is about an hour of speech:
+```bash
+cat data/trump/filelists/video-duration.txt | awk '{s+=$2}END{print s / 60}'
+# 57.4384
+```
+- Extract face landmarks, normalize and apply PCA:
+```bash
+python scripts/extract_face_landmarks.py --dataset trump-360p --filelist full --n-cpu 4 -v
+python scripts/normalize_and_pca_lips.py -d trump-360p -f full
+```
+- Chunk data into 10s segments.
+
 # Main functionality
 
 Extract face landmarks:
