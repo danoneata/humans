@@ -227,6 +227,7 @@ class Trump(Dataset):
     def __init__(self, video_res):
         self.video_res = video_res
         self.name = "trump"
+        self.name_long = "trump" + "-" + video_res
 
     def load_filelist(self, filelist):
         path = os.path.join(self.base_path, "filelists", filelist + ".txt")
