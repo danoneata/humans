@@ -86,6 +86,7 @@ def split_videos(key, ranges, to_show):
                     # than the `-c copy` option.
                     "-c:v", "libx264",
                     "-c:a", "aac",
+                    "-filter:v", "fps=fps=" + str(FPS),
                     dst,
                 ]
             )
