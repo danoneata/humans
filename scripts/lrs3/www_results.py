@@ -17,6 +17,7 @@ from dominate.util import raw
 from toolz import compose, first, partition_all, second
 
 from data import LRS3
+from scripts.generate_video_lips import split_key
 from utils import make_folder
 
 
