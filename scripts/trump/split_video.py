@@ -42,10 +42,9 @@ def get_color_histograms(path_video):
         ]
     )
 
-
-def get_frame_ranges(histograms, τ, to_show=False):
-    R = 19 * 60 * FPS  # reference frame
-    dists = np.mean((histograms - histograms[R]) ** 2, axis=1)
+def get_frame_ranges(histograms, reference_time, τ, to_show=False):
+    reference_frame = int(reference_time * FPS)  # reference frame
+    dists = np.mean((histograms - histograms[reference_frame]) ** 2, axis=1)
 
     if to_show:
         fig, ax = plt.subplots()
@@ -121,14 +120,15 @@ def extract_audio(key, ranges):
 
 @click.command()
 @click.option("-k", "--key", required=True)
+@click.option("-r", "--reference-time", "reference_time", required=True, type=click.FLOAT, help="timestamp for the reference frame")
 @click.option("--to-show", "to_show")
-def main(key, to_show=False):
+def main(key, reference_time, to_show=False):
     path_video = f"data/trump/video-360p/{key}.mp4"
     path_hists = f"output/trump/video-360p/color-histograms-{key}.npy"
     path_ranges = f"output/trump/video-360p/frame-ranges-{key}-{τ}.npy"
 
     histograms = cache(get_color_histograms, path_hists, path_video)
-    ranges = cache(get_frame_ranges, path_ranges, histograms, τ, to_show)
+    ranges = cache(get_frame_ranges, path_ranges, histograms, reference_time, τ, to_show)
     split_videos(key, ranges, to_show)
     extract_audio(key, ranges)
     # python scripts/extract_face_landmarks.py --dataset trump-360p --filelist full --n-cpu 4 -v
