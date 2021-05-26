@@ -67,7 +67,7 @@ FACE_LANDMARKS_DIR = {
 @click.command()
 @click.option("-d", "--dataset", "dataset_name", type=click.Choice(DATASETS))
 @click.option("-m", "--model", type=click.Choice(MODEL_DIR["obama-360p"]))
-@click.option("-s", "--split", type=click.Choice(["valid", "test"]))
+@click.option("-s", "--split")
 def main(dataset_name, model="asr-ave", split="test"):
     pca = load_pca()
     dataset = DATASETS[dataset_name]()  # type: Dataset
