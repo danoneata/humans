@@ -43,6 +43,13 @@ for r in [2, 4, 8, 16, 32, 64]:
         MODEL_DIR["obama-360p"][key] = src
 
 
+for r in [2, 4, 8, 16, 32, 64]:
+    for k in range(5):
+        key = "subsample-reciprocal-{:02d}-num-{:d}-v2".format(r, k)
+        src = "baseline-subsample-v2/reciprocal-{:02d}-num-{:d}/asr/output-test-ave".format(r, k)
+        MODEL_DIR["obama-360p"][key] = src
+
+
 FILELISTS = {
     "obama-360p": lambda split: "chunks-" + split,
     "trump-360p": lambda split: "chunks-" + split,
