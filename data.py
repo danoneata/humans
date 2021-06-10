@@ -10,6 +10,14 @@ Key = Any
 
 
 class Dataset(metaclass=ABCMeta):
+    def __init__(self):
+        self.audio_ext = "wav"
+        self.video_ext = "mp4"
+
+    @property
+    def base_path(self):
+        return os.path.join("data", self.name)
+
     @abstractmethod
     def load_filelist(self, name: str) -> List[Key]:
         pass
@@ -222,7 +230,7 @@ class Trump(Dataset):
     audio_ext = "wav"
     video_ext = "mp4"
     base_path = "data/trump"
-    fps = 30.00
+    fps = 29.97
 
     def __init__(self, video_res):
         self.video_res = video_res
@@ -247,6 +255,31 @@ class Trump(Dataset):
         return os.path.join(self.base_path, "face-landmarks-" + self.video_res, key + ".json")
 
 
+class Iohannis(Dataset):
+    def __init__(self, video_res):
+        super().__init__()
+        self.video_res = video_res
+        self.name = "iohannis"
+        self.fps = 25
+
+    def load_filelist(self, filelist):
+        path = os.path.join(self.base_path, "filelists", filelist + ".txt")
+        with open(path, "r") as f:
+            return [line.strip() for line in f.readlines()]
+
+    def get_video_orig_path(self, key):
+        return os.path.join(self.base_path, "video-orig", key + "." + self.video_ext)
+
+    def get_video_path(self, key):
+        return os.path.join(self.base_path, "video-" + self.video_res, key + "." + self.video_ext)
+
+    def get_audio_path(self, key):
+        return os.path.join(self.base_path, "audio", key + "." + self.audio_ext)
+
+    def get_face_landmarks_path(self, key, landmark_type="dlib"):
+        return os.path.join(self.base_path, "face-landmarks-" + self.video_res, key + ".json")
+
+
 DATASETS = {
     "grid": GRID,
     # TODO Parameterize dataset by video size.
@@ -256,4 +289,5 @@ DATASETS = {
     "diego-360p": lambda: Diego(video_res="360p"),
     "diego-1080p": lambda: Diego(video_res="1080p"),
     "trump-360p": lambda: Trump(video_res="360p"),
+    "iohannis-360p": lambda: Iohannis(video_res="360p"),
 }
