@@ -15,6 +15,11 @@ class Dataset(metaclass=ABCMeta):
         self.video_ext = "mp4"
 
     @property
+    @abstractmethod
+    def name(self):
+        pass
+
+    @property
     def base_path(self):
         return os.path.join("data", self.name)
 
@@ -257,10 +262,15 @@ class Trump(Dataset):
 
 class Iohannis(Dataset):
     def __init__(self, video_res):
+        # self.name = "iohannis"
         super().__init__()
         self.video_res = video_res
-        self.name = "iohannis"
         self.fps = 25
+        self.name_long = self.name + "-" + video_res
+
+    @property
+    def name(self):
+        return "iohannis"
 
     def load_filelist(self, filelist):
         path = os.path.join(self.base_path, "filelists", filelist + ".txt")
