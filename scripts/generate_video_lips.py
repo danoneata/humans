@@ -57,10 +57,10 @@ def get_path_audio(dataset, key):
     return os.path.join("output", dataset.name, "audio-chunks", key1, part + ".wav")
 
 
-def generate_pred_vs_true(dataset, key):
-    video_path = os.path.join("output", dataset.name ,"lips-predicted-baseline", "pred-vs-true", key + ".mp4")
+def generate_true_vs_pred_multi(dataset, split, key, methods, to_overwrite=False, titles=None):
+    video_path = os.path.join("output", dataset.name ,"lips-predicted-multiple-methods", "true", key + ".mp4")
 
-    if os.path.exists(video_path):
+    if not to_overwrite and os.path.exists(video_path):
         return video_path
 
     pca = load_pca()
