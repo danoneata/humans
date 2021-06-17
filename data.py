@@ -210,10 +210,11 @@ class Diego(Dataset):
     video_ext = "mp4"
     base_path = "data/diego"
     fps = 29.97
+    name = "diego"
 
     def __init__(self, video_res):
         self.video_res = video_res
-        self.name = "diego-" + video_res
+        self.name_long = "diego-" + video_res
 
     def load_filelist(self, name=""):
         return "talking1 talking2 head_poses lips".split()
@@ -236,10 +237,10 @@ class Trump(Dataset):
     video_ext = "mp4"
     base_path = "data/trump"
     fps = 29.97
+    name = "trump"
 
     def __init__(self, video_res):
         self.video_res = video_res
-        self.name = "trump"
         self.name_long = "trump" + "-" + video_res
 
     def load_filelist(self, filelist):
@@ -261,16 +262,13 @@ class Trump(Dataset):
 
 
 class Iohannis(Dataset):
+    name = "iohannis"
+
     def __init__(self, video_res):
-        # self.name = "iohannis"
         super().__init__()
         self.video_res = video_res
         self.fps = 25
         self.name_long = self.name + "-" + video_res
-
-    @property
-    def name(self):
-        return "iohannis"
 
     def load_filelist(self, filelist):
         path = os.path.join(self.base_path, "filelists", filelist + ".txt")
