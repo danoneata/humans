@@ -136,11 +136,11 @@ def split_lip(dataset, key, verbose, use_pca=True):
     required=True,
     type=click.Choice(list(DATASETS.keys())),
 )
-@click.option("-s", "--split", required=True)
+@click.option("-f", "--filelist", required=True)
 @click.option("-v", "--verbose", default=0, count=True, help="how chatty to be")
-def main(dataset_name, split, verbose):
+def main(dataset_name, filelist, verbose):
     dataset = DATASETS[dataset_name]()
-    keys = dataset.load_filelist(split)
+    keys = dataset.load_filelist(filelist)
 
     _ = list(concat([split_lip(dataset, key, verbose, use_pca=False) for key in keys]))
 
@@ -157,7 +157,7 @@ def main(dataset_name, split, verbose):
         data_wav_scp = [datum for datum in data_wav_scp if first(datum) in keys_common]
         data_lip_scp = [datum for datum in data_lip_scp if first(datum) in keys_common]
 
-    folder = dataset.name + "-chunks-" + split
+    folder = dataset.name + "-chunks-" + filelist
 
     path_wav_scp = os.path.join(ESPNET_EGS_PATH, "data", folder, "wav.scp")
     path_lip_scp = os.path.join(ESPNET_EGS_PATH, "data", folder, "lip.scp")
