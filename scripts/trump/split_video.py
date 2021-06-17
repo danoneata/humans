@@ -1,3 +1,4 @@
+import csv
 import os
 import pdb
 import subprocess
@@ -16,7 +17,7 @@ from toolz import second
 from scripts.extract_face_landmarks import iterate_frames
 
 
-FPS = 30
+FPS = 29.97
 τ = 2e-4
 
 
@@ -65,7 +66,7 @@ def get_frame_ranges(histograms, reference_time, τ, to_show=False):
     return list(ranges)
 
 
-def split_videos(key, ranges, to_show):
+def split_videos(key, ranges, to_show=False):
     path_video = f"data/trump/video-360p/{key}.mp4"
     for i, (α, ω) in enumerate(ranges):
         start = α / FPS
@@ -86,7 +87,7 @@ def split_videos(key, ranges, to_show):
                     # than the `-c copy` option.
                     "-c:v", "libx264",
                     "-c:a", "aac",
-                    "-filter:v", "fps=fps=" + str(FPS),
+                    # "-filter:v", "fps=fps=" + str(FPS),
                     dst,
                 ]
             )
@@ -96,43 +97,68 @@ def split_videos(key, ranges, to_show):
             st.video(dst)
 
 
-def extract_audio(key, ranges):
+def extract_audio(key, ranges, to_show=False):
     for i, _ in enumerate(ranges):
         src = f"data/trump/video-split-360p/{key}-{i:03d}.mp4"
         dst = f"data/trump/audio-split/{key}-{i:03d}.wav"
 
-        if os.path.exists(dst):
-            continue
+        if not os.path.exists(dst):
+            # fmt: off
+            subprocess.run(
+                [
+                    "ffmpeg",
+                    "-i", src,
+                    "-vn",
+                    "-ac", "1",
+                    "-ar", "16000",
+                    "-acodec", "pcm_s16le",
+                    dst,
+                ]
+            )
+            # fmt: on
 
-        # fmt: off
-        subprocess.run(
-            [
-                "ffmpeg",
-                "-i", src,
-                "-vn",
-                "-ac", "1",
-                "-ar", "16000",
-                "-acodec", "pcm_s16le",
-                dst,
-            ]
-        )
-        # fmt: on
+        if to_show:
+            st.audio(dst)
+
+
+def load_ranges(key):
+    def to_frame_num(mm_ss):
+        mm, ss = mm_ss.split(":")
+        seconds = int(mm) * 60 + int(ss)
+        return seconds * FPS
+    VALID_POSES = ["Front", "Front-ish"]
+    with open("data/trump/filelists/video-shots.csv", "r") as f:
+        reader = csv.reader(f)
+        header = next(reader)
+        ranges = [
+            (to_frame_num(α), to_frame_num(ω))
+            for k, α, ω, pose, _ in reader
+            if k == key and pose in VALID_POSES
+        ]
+    return ranges
 
 
 @click.command()
 @click.option("-k", "--key", required=True)
-@click.option("-r", "--reference-time", "reference_time", required=True, type=click.FLOAT, help="timestamp for the reference frame")
-@click.option("--to-show", "to_show")
-def main(key, reference_time, to_show=False):
-    path_video = f"data/trump/video-360p/{key}.mp4"
-    path_hists = f"output/trump/video-360p/color-histograms-{key}.npy"
-    path_ranges = f"output/trump/video-360p/frame-ranges-{key}-{τ}.npy"
+@click.option("-t", "--reference-time", "reference_time", type=click.FLOAT, help="timestamp for the reference frame")
+@click.option("-a", "--use-annotations", "to_use_annotations", help="use manual annotations of ranges", is_flag=True)
+@click.option("--to-show", "to_show", is_flag=True)
+def main(key, reference_time=None, to_use_annotations=False, to_show=False):
+    assert reference_time is not None or to_use_annotations
 
-    histograms = cache(get_color_histograms, path_hists, path_video)
-    ranges = cache(get_frame_ranges, path_ranges, histograms, reference_time, τ, to_show)
+    path_video = f"data/trump/video-360p/{key}.mp4"
+
+    if to_use_annotations:
+        ranges = load_ranges(key)
+    else:
+        path_hists = f"output/trump/video-360p/color-histograms-{key}.npy"
+        path_ranges = f"output/trump/video-360p/frame-ranges-{key}-{τ}.npy"
+
+        histograms = cache(get_color_histograms, path_hists, path_video)
+        ranges = cache(get_frame_ranges, path_ranges, histograms, reference_time, τ, to_show)
+
     split_videos(key, ranges, to_show)
-    extract_audio(key, ranges)
-    # python scripts/extract_face_landmarks.py --dataset trump-360p --filelist full --n-cpu 4 -v
+    extract_audio(key, ranges, to_show)
 
 
 if __name__ == "__main__":
