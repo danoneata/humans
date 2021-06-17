@@ -28,11 +28,14 @@ MODEL_DIR = {
         "asr-finetune-all-ave": "baseline/asr-finetune-all/output-{}-ave",
     },
     "trump-360p": {
-        "asr-finetune-all-ave": "baseline/asr-finetune-all/output-trump-chunks-{}-ave",
+        "asr-finetune-all-ave": "baseline/asr-finetune-all/output-trump-{}-ave",
     },
     "lrs3": {
         "asr-ave": "baseline/asr/output-lrs3-{}-ave",
         "asr-finetune-all-ave": "baseline/asr-finetune-all/output-lrs3-{}-ave",
+    },
+    "iohannis-360p": {
+        "asr-finetune-all-ave": "baseline/asr-finetune-all/output-iohannis-{}-ave",
     },
 }
 
@@ -50,26 +53,59 @@ for r in [2, 4, 8, 16, 32, 64]:
         MODEL_DIR["obama-360p"][key] = src
 
 
+for n in [30, 60, 120, 240]:
+    key = f"trump-chunks-cpac-ss-num-{n:05d}-seed-1337"
+    src = f"finetune/trump-chunks-cpac-ss-num-{n:05d}-seed-1337/asr/predict-ave/trump-chunks-corona-test"
+    MODEL_DIR["trump-360p"][key] = src
+
+
+for n in [30, 60, 120, 240]:
+    for s in range(5):
+        key = f"trump-chunks-manual-shots-ss-num-{n:05d}-seed-{s:04d}"
+        src = f"finetune/trump-chunks-manual-shots-ss-num-{n:05d}-seed-{s:04d}/asr/predict-ave/trump-chunks-corona-test"
+        MODEL_DIR["trump-360p"][key] = src
+
+
+for n in [30, 60, 120]:
+    for s in range(5):
+        key = f"trump-chunks-manual-shots-front-ss-num-{n:05d}-seed-{s:04d}"
+        src = f"finetune/trump-chunks-manual-shots-front-ss-num-{n:05d}-seed-{s:04d}/asr/predict-ave/trump-chunks-corona-test"
+        MODEL_DIR["trump-360p"][key] = src
+
+
 FILELISTS = {
     "obama-360p": lambda split: "chunks-" + split,
-    "trump-360p": lambda split: "chunks-" + split,
+    "trump-360p": lambda split: split,
     "lrs3": lambda split: split,
+    "iohannis-360p": lambda split: split,
 }
 
 
 FACE_LANDMARKS_DIR = {
     "obama-360p": lambda key, use_pca: "output/obama/face-landmarks-npy-dlib{}-chunks/{}/{}.npy".format("-pca" if use_pca else "", *split_key(key)),
     "trump-360p": lambda key, use_pca: "output/trump/face-landmarks-npy-dlib{}-chunks/{}/{}.npy".format("-pca" if use_pca else "", *split_key(key)),
-    "lrs3": lambda key, use_pca: "output/lrs3/face-landmarks-npy-dlib{}/{}.npy".format("-pca" if use_pca else "", key)
+    "lrs3": lambda key, use_pca: "output/lrs3/face-landmarks-npy-dlib{}/{}.npy".format("-pca" if use_pca else "", key),
+    "iohannis-360p": lambda key, use_pca: "output/iohannis/face-landmarks-npy-dlib{}-chunks/{}/{}.npy".format("-pca" if use_pca else "", *split_key(key)),
 }
+
+
+def mean_squared_error_zip(true, pred):
+    n_true = len(true)
+    n_pred = len(pred)
+    i = min(n_true, n_pred)
+    return mean_squared_error(true[:i], pred[:i])
 
 
 @click.command()
 @click.option("-d", "--dataset", "dataset_name", type=click.Choice(DATASETS))
-@click.option("-m", "--model", type=click.Choice(MODEL_DIR["obama-360p"]))
+@click.option("-m", "--model")
 @click.option("-s", "--split")
 def main(dataset_name, model="asr-ave", split="test"):
     pca = load_pca()
+
+    # from scripts.iohannis.show_mean_lip import load_mean_lip
+    # pca.mean_ = load_mean_lip(dataset_name, split).reshape(40)
+
     dataset = DATASETS[dataset_name]()  # type: Dataset
 
     get_path_true_lg = partial(FACE_LANDMARKS_DIR[dataset_name], use_pca=False)  # type: Callable[[Any], Any]
@@ -90,12 +126,6 @@ def main(dataset_name, model="asr-ave", split="test"):
     y_pred_sm = [np.load(get_path_pred_sm(key)).squeeze() for key in keys]
 
     # MSE in PCA space
-    def mean_squared_error_zip(true, pred):
-        n_true = len(true)
-        n_pred = len(pred)
-        i = min(n_true, n_pred)
-        return mean_squared_error(true[:i], pred[:i])
-
     # err = [mean_squared_error(t, np.zeros(t.shape)) for t in y_true_sm]
     # print("MSE 8D:", np.mean(err))
     # pdb.set_trace()
