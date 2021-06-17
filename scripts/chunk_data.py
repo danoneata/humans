@@ -54,16 +54,17 @@ def split_wav(dataset, key, verbose=0):
         path_o = get_path_o(key, i)
         make_folder(path_o)
 
-        chunk = audio[start : start + DURATION + OVERLAP]
-        chunk.export(path_o, format="wav")
+        if not os.path.exists(path_o):
+            chunk = audio[start : start + DURATION + OVERLAP]
+            chunk.export(path_o, format="wav")
+
+            if verbose:
+                print(f"· {i:03d} {chunk.duration_seconds:6.2f}")
 
         start = start + DURATION
 
         key_chunk = key + "-" + f"{i:03d}"
         data_scp.append((key_chunk, path_o))
-
-        if verbose:
-            print(f"· {i:03d} {chunk.duration_seconds:6.2f}")
 
     if verbose:
         print()
@@ -106,18 +107,20 @@ def split_lip(dataset, key, verbose, use_pca=True):
         path_o = get_path_o(key, i)
         make_folder(path_o)
 
-        α = time_to_frame(start)
-        ω = time_to_frame(start + DURATION + OVERLAP)
-        chunk = lips[α:ω]
-        np.save(path_o, chunk)
+        if not os.path.exists(path_o):
+            α = time_to_frame(start)
+            ω = time_to_frame(start + DURATION + OVERLAP)
+
+            chunk = lips[α:ω]
+            np.save(path_o, chunk)
+
+            if verbose:
+                print(f"· {i:03d} {len(chunk):3d} ← {α:4d} : {ω:4d}")
 
         start = start + DURATION
 
         key_chunk = key + "-" + f"{i:03d}"
         data_scp.append((key_chunk, path_o))
-
-        if verbose:
-            print(f"· {i:03d} {len(chunk):3d} ← {α:4d} : {ω:4d}")
 
     if verbose:
         print()
