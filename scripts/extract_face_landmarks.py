@@ -53,6 +53,7 @@ def detect_face_alignment_fa(fa, image):
     else:
         return []
 
+
 def detect_face_landmarks_facemesh(detector, net, image):
     """ Returns the FaceMesh points located around the lip region
         of the image. It uses the DLIB face detector to crop the
@@ -88,13 +89,17 @@ def detect_face_landmarks_facemesh(detector, net, image):
     lip_detections = detections[CONTOUR_POINTS_LIST,:]*norm_factor
     return lip_detections.tolist()
 
+
 def iterate_frames(path_video):
     video_capture = cv2.VideoCapture(path_video)
+    if not video_capture.isOpened():
+        raise FileNotFoundError(f"Cannot open video: {path_video}")
     while True:
         ret, image = video_capture.read()
         if not ret:
             break
         yield image
+    video_capture.release()
 
 
 def landmarks_to_numpy(landmarks: List[List[List[Tuple]]]) -> Optional[np.ndarray]:
