@@ -10,9 +10,8 @@ Key = Any
 
 
 class Dataset(metaclass=ABCMeta):
-    def __init__(self):
-        self.audio_ext = "wav"
-        self.video_ext = "mp4"
+    audio_ext = "wav"
+    video_ext = "mp4"
 
     @property
     @abstractmethod
