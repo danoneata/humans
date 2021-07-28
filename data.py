@@ -215,8 +215,10 @@ class Diego(Dataset):
         self.video_res = video_res
         self.name_long = "diego-" + video_res
 
-    def load_filelist(self, name=""):
-        return "talking1 talking2 head_poses lips".split()
+    def load_filelist(self, name):
+        path = os.path.join(self.base_path, "filelists", name + ".txt")
+        with open(path, "r") as f:
+            return [line.strip() for line in f.readlines()]
 
     def get_video_orig_path(self, key):
         return os.path.join(self.base_path, "video-orig", key + "." + self.video_ext)
