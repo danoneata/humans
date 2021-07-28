@@ -299,4 +299,5 @@ DATASETS = {
     "diego-1080p": lambda: Diego(video_res="1080p"),
     "trump-360p": lambda: Trump(video_res="360p"),
     "iohannis-360p": lambda: Iohannis(video_res="360p"),
+    "iohannis-720p": lambda: Iohannis(video_res="720p"),
 }
